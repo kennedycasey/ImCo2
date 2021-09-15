@@ -88,6 +88,7 @@ class ImcoTkApp(object):
                 fg = '#05976c',
                 bg = '#f6f6f6')
         self.object_name.pack()
+        self.object_entry_button.pack_forget()
 
     def build_comment_entry(self):
         self.comment_entry = simpledialog.askstring(
@@ -99,6 +100,7 @@ class ImcoTkApp(object):
                 fg = '#05976c',
                 bg = '#f6f6f6')
         self.comments.pack()
+        self.comment_entry_button.pack_forget()
 
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
@@ -133,22 +135,22 @@ class ImcoTkApp(object):
         self.codes_section_label.pack(fill=Tk.X, pady=(10, 0))
         self.code_frame = Tk.Frame(self.info_frame, bg=DEFAULT_BG)
         self.code_frame.pack(fill=Tk.X)
-        self.object_entry = Tk.Button(
+        self.object_entry_button = Tk.Button(
                 self.info_frame,
                 text = "Add object name(s)",
                 bg = DEFAULT_BG,
                 highlightbackground = DEFAULT_BG,
                 command = self.build_object_entry
                 )
-        self.object_entry.pack()
-        self.comment_entry = Tk.Button(
+        self.object_entry_button.pack()
+        self.comment_entry_button = Tk.Button(
                 self.info_frame,
                 text = "Add comments",
                 bg = DEFAULT_BG,
                 highlightbackground = DEFAULT_BG,
                 command = self.build_comment_entry
                 )
-        self.comment_entry.pack()
+        self.comment_entry_button.pack()
         self.img_canvas = Tk.Canvas(
                 self.root,
                 bg=CANVAS_BG,
