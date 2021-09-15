@@ -1,5 +1,6 @@
 import tkinter as Tk
 from tkinter import Toplevel
+from tkinter import simpledialog
 import tkinter.messagebox as tkmb
 import tkinter.filedialog
 import tkinter.font
@@ -31,8 +32,6 @@ class ImcoTkApp(object):
         # The PhotoImage instance for the currently-displayed image.
         self.photo_img = None
         self.build_menu()
-        #self.open_object_entry()
-        #self.open_comment_entry()
         self.build_main_window()
         self.install_bindings()
         self.install_protocols()
@@ -79,13 +78,25 @@ class ImcoTkApp(object):
                 state=Tk.DISABLED)
         self.root.config(menu=self.menubar)
 
-    def open_object_entry(self):
-        self.object_entry = Tk.Toplevel()
-    #self.object_entry.mainloop()
+    def build_object_entry(self):
+        self.object_entry = simpledialog.askstring(
+                title="Add object name(s)",
+                prompt="Reminder: Make sure to add commas between names if there are 2+ objects")
+        self.object_name = Tk.Label(
+                self.info_frame,
+                text = "Object names: " + self.object_entry,
+                fg = '#05976c')
+        self.object_name.pack()
 
-    def open_comment_entry(self):
-        self.comment_entry = Tk.Toplevel()
-    #self.comment_entry.mainloop()
+    def build_comment_entry(self):
+        self.comment_entry = simpledialog.askstring(
+                title="Add comments",
+                prompt="")
+        self.comments = Tk.Label(
+                self.info_frame,
+                text = "Comments: " + self.comment_entry,
+                fg = '#05976c')
+        self.comments.pack()
 
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
@@ -122,14 +133,14 @@ class ImcoTkApp(object):
         self.code_frame.pack(fill=Tk.X)
         self.object_entry = Tk.Button(
                 self.info_frame,
-                text = "Click to enter object name(s)",
-                command = self.open_object_entry
+                text = "Add object name(s)",
+                command = self.build_object_entry
                 )
         self.object_entry.pack()
         self.comment_entry = Tk.Button(
                 self.info_frame,
-                text = "Click to enter comments",
-                command = self.open_comment_entry
+                text = "Add comments",
+                command = self.build_comment_entry
                 )
         self.comment_entry.pack()
         self.img_canvas = Tk.Canvas(
