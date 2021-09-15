@@ -1,0 +1,62 @@
+{
+  "codes": [
+      {
+          "code": "Adults",
+          "key": "A",
+          "required": true,
+          "prompt": "0-9",
+          "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+      },
+      {
+          "code": "Kids",
+          "key": "K",
+          "required": true,
+          "prompt": "0-9",
+          "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+      },
+      {
+          "code": "Hands",
+          "key": "H",
+          "required": true,
+          "prompt": "C/I/B/N",
+          "values": ["C", "I", "B", "N"]
+      },
+      {
+          "code": "Crying",
+          "key": "C"
+      },
+      {
+          "code": "BreastFeeding",
+          "label": "Breast Feeding",
+          "key": "B"
+      },
+      {
+          "code": "Flagged",
+          "key": "F"
+      },
+      {
+          "code": "Unusable",
+          "key": "U",
+          "exception": true,
+          "prompt": "D/C/O",
+          "values": ["D", "C", "O"]
+      },
+      {
+          "code": "Skipped",
+          "key": "S",
+          "exception": true
+      }
+  ],
+
+  "images": {
+    "dir_glob": "*",
+    "image_glob": "*.gif",
+    "max_x": 1000,
+    "max_y": 1000
+  },
+
+  "csv": {
+    "coder": "Annotator",
+    "autosave_threshold": 1
+  }
+}
