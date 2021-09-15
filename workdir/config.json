@@ -1,49 +1,98 @@
 {
   "codes": [
       {
-          "code": "Adults",
-          "key": "A",
-          "required": true,
-          "prompt": "0-9",
-          "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+          "code": "Repeated",
+          "label": "Same as previous image",
+          "key": ".",
+          "exception": true
       },
       {
-          "code": "Kids",
-          "key": "K",
-          "required": true,
-          "prompt": "0-9",
-          "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-      },
-      {
-          "code": "Hands",
-          "key": "H",
-          "required": true,
-          "prompt": "C/I/B/N",
-          "values": ["C", "I", "B", "N"]
-      },
-      {
-          "code": "Crying",
-          "key": "C"
-      },
-      {
-          "code": "BreastFeeding",
-          "label": "Breast Feeding",
-          "key": "B"
-      },
-      {
-          "code": "Flagged",
+          "code": "Food",
+          "label": "Food/drink",
           "key": "F"
       },
       {
-          "code": "Unusable",
-          "key": "U",
-          "exception": true,
-          "prompt": "D/C/O",
-          "values": ["D", "C", "O"]
+          "code": "Clothing",
+          "key": "C"
+      },
+      {
+          "code": "Lens",
+          "label": "Camera lens",
+          "key": "L"
+      },
+      {
+          "code": "ToolWork",
+          "label": "Tool (work/cleaning)",
+          "key": "W"
+      },
+      {
+          "code": "ToolMealtime",
+          "label": "Tool (mealtime)",
+          "key": "M"
+      },
+      {
+          "code": "ToolBetelNut",
+          "label": "Tool (to chew betelnut)",
+          "key": "H"
+      },
+      {
+          "code": "Toy",
+          "label": "Toy (e.g., ball/doll)",
+          "key": "T"
+      },
+      {
+          "code": "Book",
+          "label": "Book/paper",
+          "key": "B"
+      },
+      {
+          "code": "Animal",
+          "key": "A"
+      },
+      {
+          "code": "Phone",
+          "key": "P"
+      },
+      {
+          "code": "OtherElectronic",
+          "label": "Other electronic device (e.g., TV/radio)",
+          "key": "E"
+      },
+      {
+          "code": "OtherObjectSynthetic",
+          "label": "Other object (synthetic/manmade)",
+          "key": "S"
+      },
+      {
+          "code": "OtherObjectNatural",
+          "label": "Other object (natural)",
+          "key": "N"
+      },
+      {
+          "code": "None",
+          "label": "There is no held object",
+          "key": "0",
+          "exception": true
+      },
+      {
+          "code": "Exclude",
+          "label": "Too dark/blurry/covered to judge",
+          "key": "-",
+          "exception": true
+      },
+      {
+          "code": "Unsure",
+          "label": "Unsure what the object is",
+          "key": "?",
+          "exception": true
+      },
+      {
+          "code": "Flagged",
+          "key": "!"
       },
       {
           "code": "Skipped",
-          "key": "S",
+          "key": "/",
           "exception": true
       }
   ],
