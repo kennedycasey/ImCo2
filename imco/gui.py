@@ -84,10 +84,10 @@ class ImcoTkApp(object):
                 prompt="Reminder: Make sure to add commas between names if there are 2+ objects")
         self.object_name = Tk.Label(
                 self.info_frame,
-                text = "Object names: " + self.object_entry,
+                text = "Your object names: " + self.object_entry,
                 fg = '#05976c',
                 bg = '#f6f6f6')
-        self.object_name.pack()
+        self.object_name.pack(fill=Tk.X)
         self.object_entry_button.pack_forget()
 
     def build_comment_entry(self):
@@ -96,10 +96,10 @@ class ImcoTkApp(object):
                 prompt="")
         self.comments = Tk.Label(
                 self.info_frame,
-                text = "Comments: " + self.comment_entry,
+                text = "Your comments: " + self.comment_entry,
                 fg = '#05976c',
                 bg = '#f6f6f6')
-        self.comments.pack()
+        self.comments.pack(fill=Tk.X)
         self.comment_entry_button.pack_forget()
 
     def build_main_window(self):
@@ -135,6 +135,15 @@ class ImcoTkApp(object):
         self.codes_section_label.pack(fill=Tk.X, pady=(10, 0))
         self.code_frame = Tk.Frame(self.info_frame, bg=DEFAULT_BG)
         self.code_frame.pack(fill=Tk.X)
+        self.entries_section_label = Tk.Label(
+                self.info_frame,
+                anchor=Tk.W,
+                justify=Tk.LEFT,
+                font=self.section_font,
+                fg=SECTION_FG,
+                bg=DEFAULT_BG,
+                text='TEXT ENTRIES')
+        self.entries_section_label.pack(fill=Tk.X, pady=(10, 0))
         self.object_entry_button = Tk.Button(
                 self.info_frame,
                 text = "Add object name(s)",
@@ -178,6 +187,9 @@ class ImcoTkApp(object):
         cl = CodeLabel(code, root=self.code_frame, row=len(self.code_labels),
                 listen=self.root, handler=self.handle_code)
         self.code_labels.append(cl)
+
+    #def entry_label(self):
+        #el = Label()
 
     def install_protocols(self):
         self.root.protocol('WM_DELETE_WINDOW', self.handle_delete_window)
