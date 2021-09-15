@@ -1,4 +1,5 @@
 import tkinter as Tk
+from tkinter import Toplevel
 import tkinter.messagebox as tkmb
 import tkinter.filedialog
 import tkinter.font
@@ -18,11 +19,11 @@ DEFAULT_BG = '#f6f6f6'
 SECTION_FG = '#424242'
 CANVAS_BG  = '#0d0d12'
 
-
 class ImcoTkApp(object):
 
     def __init__(self, app_state):
         self.root = Tk.Tk()
+        #self.top = Toplevel()
         self.app_state = app_state
         self.session = None
         # A list of CodeLabel instances.
@@ -30,6 +31,8 @@ class ImcoTkApp(object):
         # The PhotoImage instance for the currently-displayed image.
         self.photo_img = None
         self.build_menu()
+        #self.open_object_entry()
+        #self.open_comment_entry()
         self.build_main_window()
         self.install_bindings()
         self.install_protocols()
@@ -76,6 +79,14 @@ class ImcoTkApp(object):
                 state=Tk.DISABLED)
         self.root.config(menu=self.menubar)
 
+    def open_object_entry(self):
+        self.object_entry = Tk.Toplevel()
+    #self.object_entry.mainloop()
+
+    def open_comment_entry(self):
+        self.comment_entry = Tk.Toplevel()
+    #self.comment_entry.mainloop()
+
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
         self.root.config(bg=DEFAULT_BG)
@@ -109,6 +120,18 @@ class ImcoTkApp(object):
         self.codes_section_label.pack(fill=Tk.X, pady=(10, 0))
         self.code_frame = Tk.Frame(self.info_frame, bg=DEFAULT_BG)
         self.code_frame.pack(fill=Tk.X)
+        self.object_entry = Tk.Button(
+                self.info_frame,
+                text = "Click to enter object name(s)",
+                command = self.open_object_entry
+                )
+        self.object_entry.pack()
+        self.comment_entry = Tk.Button(
+                self.info_frame,
+                text = "Click to enter comments",
+                command = self.open_comment_entry
+                )
+        self.comment_entry.pack()
         self.img_canvas = Tk.Canvas(
                 self.root,
                 bg=CANVAS_BG,
