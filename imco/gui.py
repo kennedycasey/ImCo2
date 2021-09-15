@@ -85,7 +85,8 @@ class ImcoTkApp(object):
         self.object_name = Tk.Label(
                 self.info_frame,
                 text = "Object names: " + self.object_entry,
-                fg = '#05976c')
+                fg = '#05976c',
+                bg = '#f6f6f6')
         self.object_name.pack()
 
     def build_comment_entry(self):
@@ -95,7 +96,8 @@ class ImcoTkApp(object):
         self.comments = Tk.Label(
                 self.info_frame,
                 text = "Comments: " + self.comment_entry,
-                fg = '#05976c')
+                fg = '#05976c',
+                bg = '#f6f6f6')
         self.comments.pack()
 
     def build_main_window(self):
@@ -134,12 +136,16 @@ class ImcoTkApp(object):
         self.object_entry = Tk.Button(
                 self.info_frame,
                 text = "Add object name(s)",
+                bg = DEFAULT_BG,
+                highlightbackground = DEFAULT_BG,
                 command = self.build_object_entry
                 )
         self.object_entry.pack()
         self.comment_entry = Tk.Button(
                 self.info_frame,
                 text = "Add comments",
+                bg = DEFAULT_BG,
+                highlightbackground = DEFAULT_BG,
                 command = self.build_comment_entry
                 )
         self.comment_entry.pack()
