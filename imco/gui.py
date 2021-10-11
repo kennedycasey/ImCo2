@@ -288,6 +288,7 @@ class ImcoTkApp(object):
                 highlightbackground = DEFAULT_BG,
                 command = self.build_comment_entry
                 )
+        self.comment_entry_button.pack()
         
         
             
