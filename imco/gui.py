@@ -267,28 +267,11 @@ class ImcoTkApp(object):
             self.draw_image()
             if not self.session.img_coded():
                 self.session.update_frontier()
-            self.comments.config(text='')
-            self.object_name.config(text='')
-            self.new_buttons()
-            
+            self.comments.destroy()
+            self.object_name.destroy()
+            self.object_entry_button.pack()
+            self.comment_entry_button.pack()
 
-    def new_buttons(self):
-        self.object_entry_button = Tk.Button(
-            self.info_frame,
-            text = "Add object name(s)",
-            bg = DEFAULT_BG,
-            highlightbackground = DEFAULT_BG,
-            command = self.build_object_entry
-            )
-        self.object_entry_button.pack()
-        self.comment_entry_button = Tk.Button(
-                self.info_frame,
-                text = "Add comments",
-                bg = DEFAULT_BG,
-                highlightbackground = DEFAULT_BG,
-                command = self.build_comment_entry
-                )
-        self.comment_entry_button.pack()
         
         
             
