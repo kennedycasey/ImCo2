@@ -102,6 +102,14 @@ class ImcoTkApp(object):
         self.comments.pack(fill=Tk.X)
         self.comment_entry_button.pack_forget()
 
+
+    def build_undo(self):
+        self.comments.destroy()
+        self.comment_entry_button.pack()
+        self.object_name.destroy()
+        self.object_entry_button.pack()
+        self.undo_button.pack(after=self.object_entry_button)
+
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
         self.root.config(bg=DEFAULT_BG)
@@ -160,6 +168,14 @@ class ImcoTkApp(object):
                 command = self.build_comment_entry
                 )
         self.comment_entry_button.pack()
+        self.undo_button = Tk.Button(
+            self.info_frame,
+            text = 'Undo',
+            bg = DEFAULT_BG,
+            highlightbackground = DEFAULT_BG,
+            command = self.build_undo
+        )
+        self.undo_button.pack()
         self.img_canvas = Tk.Canvas(
                 self.root,
                 bg=CANVAS_BG,
@@ -242,9 +258,17 @@ class ImcoTkApp(object):
             return
         if self.session.prev_image():
             self.draw_image()
+            #self.object_name.pack(before=self.object_entry_button)
+            #self.comments.pack(before=self.object_entry_button)
+            #self.object_entry_button.pack_forget()
+            #self.comment_entry_button.pack_forget()
         elif self.session.prev_dir():
             tkmb.showinfo('', 'Going back to previous directory.')
             self.draw_image()
+            #self.object_name.pack(before=self.object_entry_button)
+            #self.comments.pack(before=self.object_entry_button)
+            #self.object_entry_button.pack_forget()
+            #self.comment_entry_button.pack_forget()
         else:
             tkmb.showinfo('', 'This is the very first image.')
 
@@ -267,10 +291,12 @@ class ImcoTkApp(object):
             self.draw_image()
             if not self.session.img_coded():
                 self.session.update_frontier()
-            self.comments.destroy()
-            self.object_name.destroy()
-            self.object_entry_button.pack()
-            self.comment_entry_button.pack()
+            self.object_entry_button.pack(before=self.object_name)
+            self.comment_entry_button.pack(before=self.object_name)
+            self.undo_button.pack(after=self.comment_entry_button)
+            self.comments.pack_forget()
+            self.object_name.pack_forget()
+            
 
         
         
