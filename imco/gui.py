@@ -258,17 +258,9 @@ class ImcoTkApp(object):
             return
         if self.session.prev_image():
             self.draw_image()
-            #self.object_name.pack(before=self.object_entry_button)
-            #self.comments.pack(before=self.object_entry_button)
-            #self.object_entry_button.pack_forget()
-            #self.comment_entry_button.pack_forget()
         elif self.session.prev_dir():
             tkmb.showinfo('', 'Going back to previous directory.')
             self.draw_image()
-            #self.object_name.pack(before=self.object_entry_button)
-            #self.comments.pack(before=self.object_entry_button)
-            #self.object_entry_button.pack_forget()
-            #self.comment_entry_button.pack_forget()
         else:
             tkmb.showinfo('', 'This is the very first image.')
 
