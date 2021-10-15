@@ -107,11 +107,16 @@ class ImcoSession(object):
         self.state['dir_index'] = self.dir_index
         self.state['img_index'] = self.img_index
 
-    def code_image(self, code, value):
+    def code_image(self, code, value, comments, object_name):
         self.img.code(code, value)
+        self.img.text(comments, object_name)
         if self.img.is_coded(self.config.codes):
             # We only record codes once they're complete.
             self.modified_images[self.img.path] = self.img
+
+    def image_text(self, comments, object_name):
+        self.img.comments = comments
+        self.img.object_name = object_name
 
     def img_coded(self):
         return self.img is not None and self.img.is_coded(self.config.codes)
@@ -160,6 +165,8 @@ class ImcoImage(object):
         self.dir = os.path.basename(dirname)
         self._modified = None
         self.codes = dict((c.code, None) for c in codes)
+        self.comments = ''
+        self.object_name = ''
 
     @property
     def timestamp(self):
@@ -176,6 +183,11 @@ class ImcoImage(object):
     def code(self, code, value):
         self.codes[code.code] = value
         self._modified = datetime.datetime.now()
+
+    def text(self, comments, object_name):
+        self.comments = comments
+        self.object_name = object_name
+
 
     def is_coded(self, codes):
         missing_required = False

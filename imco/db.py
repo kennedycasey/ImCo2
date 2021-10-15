@@ -53,13 +53,13 @@ class ImcoDb(object):
         curs = conn.cursor()
         code_columns = [c.code for c in codes]
         columns_str = ', '.join(code_columns)
-        qmarks = ', '.join(['?'] * (3 + len(code_columns)))
-        q = '''INSERT OR REPLACE INTO `codes` (Dir, Image, Modified, {})
+        qmarks = ', '.join(['?'] * (5 + len(code_columns)))
+        q = '''INSERT OR REPLACE INTO `codes` (Dir, Image, Modified, Object, Comments, {})
                VALUES ({})'''.format(columns_str, qmarks)
         values = []
         for img in images:
             code_values = [c.to_db(img.codes[c.code]) for c in codes]
-            v = tuple([img.dir, img.name, img.timestamp] + code_values)
+            v = tuple([img.dir, img.name, img.timestamp, img.object_name, img.comments] + code_values)
             values.append(v)
         curs.executemany(q, values)
         conn.commit()
@@ -81,6 +81,8 @@ class ImcoDb(object):
                 Dir TEXT,
                 Image TEXT,
                 Modified TEXT CURRENT_TIMESTAMP,
+                Object TEXT
+                Comments TEXT
                 {},
                 PRIMARY KEY (Dir, Image)
             )'''.format(col_defs)

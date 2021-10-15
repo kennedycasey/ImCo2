@@ -88,6 +88,9 @@ class ImcoTkApp(object):
                 fg = '#05976c',
                 bg = '#f6f6f6')
         self.object_name.pack(fill=Tk.X)
+        self.session.img.object_name = self.object_entry
+        if self.object_entry != '':
+            self.session.modified_images[self.session.img.path]=self.session.img
         self.object_entry_button.pack_forget()
 
     def build_comment_entry(self):
@@ -100,6 +103,9 @@ class ImcoTkApp(object):
                 fg = '#05976c',
                 bg = '#f6f6f6')
         self.comments.pack(fill=Tk.X)
+        self.session.img.comments = self.comment_entry
+        if self.comment_entry != '':
+            self.session.modified_images[self.session.img.path]=self.session.img
         self.comment_entry_button.pack_forget()
 
 
@@ -109,7 +115,10 @@ class ImcoTkApp(object):
         self.object_name.destroy()
         self.object_entry_button.pack()
         self.undo_button.pack(after=self.object_entry_button)
-
+        self.session.img.comments = ''
+        self.session.img.object_name = ''
+        self.session.modified_images[self.session.img.path]=self.session.img
+    
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
         self.root.config(bg=DEFAULT_BG)
@@ -252,6 +261,7 @@ class ImcoTkApp(object):
     def handle_code(self, code, value):
         if self.session:
             self.session.code_image(code, value)
+            
 
     def handle_prev_image(self, event=None):
         if self.session is None:
@@ -280,6 +290,7 @@ class ImcoTkApp(object):
             tkmb.showinfo('R U SRS???',
                     "You reached the end! You're a coding god!")
         if update_image:
+            #self.session.modified_images[self.session.img.path]=self.session.img
             self.draw_image()
             if not self.session.img_coded():
                 self.session.update_frontier()
