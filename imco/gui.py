@@ -242,7 +242,8 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('Right'), self.handle_frontier)
 
     def handle_open(self, event=None):
-        path = tkinter.filedialog.askdirectory(parent=self.root)
+        path = tkinter.filedialog.askdirectory(initialdir = os.getcwd(),
+            parent=self.root)
         # TODO: Handle empty path, missing files, etc.
         self.open_workdir(path)
 
