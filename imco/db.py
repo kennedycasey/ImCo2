@@ -48,9 +48,18 @@ class ImcoDb(object):
         curs.execute(q, args)
         return curs
 
+    def first_image(self):
+        conn = self.get()
+        curs = conn.cursor()
+        curs.execute('ALTER TABLE "codes" ADD COLUMN Object')
+        curs.execute('ALTER TABLE "codes" ADD COLUMN Comments')
+        conn.commit()
+
     def store_image_rows(self, images, codes):
         conn = self.get()
         curs = conn.cursor()
+        #curs.execute('ALTER TABLE codes ADD COLUMN Object')
+        #curs.execute('ALTER TABLE codes ADD COLUMN Comments')
         code_columns = [c.code for c in codes]
         columns_str = ', '.join(code_columns)
         qmarks = ', '.join(['?'] * (5 + len(code_columns)))

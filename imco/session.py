@@ -52,6 +52,8 @@ class ImcoSession(object):
         return glob.glob(self.path(*components))
 
     def load_images(self, imco_dir):
+        if self.dir_index==0:
+            self.db.first_image()
         paths = glob.glob(os.path.join(imco_dir.path, self.config.image_glob))
         img_rows = self.db.load_image_rows(imco_dir.name)
         images = []
@@ -82,7 +84,7 @@ class ImcoSession(object):
         return True
 
     def set_image(self, index):
-        self.img_index = index;
+        self.img_index = index
         self.img = self.dir.images[index]
 
     def prev_image(self):
@@ -125,6 +127,8 @@ class ImcoSession(object):
             self.save()
 
     def save(self):
+        if self.img_index==0 and self.dir_index==0:
+            self.db.first_image()
         self.db.store_state(self.state)
         modified = list(self.modified_images.values())
         self.modified_images = {}
