@@ -48,7 +48,7 @@ class ImcoDb(object):
         curs.execute(q, args)
         return curs
 
-    def store_image_rows(self, images, codes):
+    def store_image_rows(self, images, codes, prev_image):
         conn = self.get()
         curs = conn.cursor()
         code_columns = [c.code for c in codes]

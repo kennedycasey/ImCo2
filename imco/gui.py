@@ -290,7 +290,6 @@ class ImcoTkApp(object):
             tkmb.showinfo('R U SRS???',
                     "You reached the end! You're a coding god!")
         if update_image:
-            #self.session.modified_images[self.session.img.path]=self.session.img
             self.draw_image()
             if not self.session.img_coded():
                 self.session.update_frontier()
