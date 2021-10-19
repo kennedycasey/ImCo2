@@ -20,6 +20,7 @@ class ImcoConfig(object):
         self.autosave_threshold = int(self.get('csv.autosave_threshold', 1))
         self.coder = str(self.get('csv.coder', 'Lucky R.A.'))
         self.codes = [ImcoCode(**c) for c in self.get('codes', [])]
+        
 
     def get(self, path, default=None):
         v = self.config
