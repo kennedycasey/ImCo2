@@ -108,6 +108,18 @@ class ImcoTkApp(object):
         self.comment_entry_button.pack_forget()
 
 
+    '''
+    def next_skipped(self):
+        for dir in self.session.dirs:
+            img_lst = self.session.load_images(dir)
+            for index in range(img_lst):
+                if img_lst[index].codes['Skipped']==1:
+                    self.session.next_image(index)
+                    self.session.check_autosave()
+                    self.draw_image()
+                    break
+    '''
+
     #def build_comment_undo(self):
         #self.comments.destroy()
         #self.comment_entry_button.pack()

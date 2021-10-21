@@ -1,4 +1,5 @@
 import sqlite3
+import datetime
 
 
 class ImcoDb(object):
@@ -48,6 +49,15 @@ class ImcoDb(object):
         curs.execute(q, args)
         return curs
 
+    def first_image(self, codes):
+        conn = self.get()
+        curs = conn.cursor()
+        rows = curs.execute('SELECT * from codes;').fetchall()
+        if len(rows)==0:
+                curs.execute('ALTER TABLE "codes" ADD COLUMN Object')
+                curs.execute('ALTER TABLE "codes" ADD COLUMN Comments')
+        conn.commit()
+
     def store_image_rows(self, images, codes):
         conn = self.get()
         curs = conn.cursor()
@@ -81,8 +91,8 @@ class ImcoDb(object):
                 Dir TEXT,
                 Image TEXT,
                 Modified TEXT CURRENT_TIMESTAMP,
-                Object TEXT
-                Comments TEXT
+                Object TEXT,
+                Comments TEXT,
                 {},
                 PRIMARY KEY (Dir, Image)
             )'''.format(col_defs)
