@@ -109,7 +109,8 @@ class ImcoSession(object):
         self.state['img_index'] = self.img_index
 
     def code_image(self, code, value):
-        if 'Repeated' in self.img.codes:
+        #if 'Repeated' in self.img.codes:
+        if self.img.codes['Repeated']==1:
             self.img.codes = self.dir._images[self.img_index-1].codes
         else:
             self.img.code(code, value)

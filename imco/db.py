@@ -60,7 +60,6 @@ class ImcoDb(object):
         conn.commit()
 
     def store_image_rows(self, images, codes):
-        #self.first_image(codes)
         conn = self.get()
         curs = conn.cursor()
         code_columns = [c.code for c in codes]
@@ -70,8 +69,6 @@ class ImcoDb(object):
                VALUES ({})'''.format(columns_str, qmarks)
         values = []
         for img in images:
-            if img._modified == None:
-                img._modified = datetime.datetime.now()
             code_values = [c.to_db(img.codes[c.code]) for c in codes]
             v = tuple([img.dir, img.name, img.timestamp, img.object_name, img.comments] + code_values)
             values.append(v)
