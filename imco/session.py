@@ -97,7 +97,6 @@ class ImcoSession(object):
             return False
         self.set_image(self.img_index + 1)
         self.check_autosave()
-        #self.save()
         return True
 
     def jump_to_frontier_image(self):
@@ -109,7 +108,6 @@ class ImcoSession(object):
         self.state['img_index'] = self.img_index
 
     def code_image(self, code, value):
-        #if 'Repeated' in self.img.codes:
         if self.img.codes['Repeated']==1:
             self.img.codes = self.dir._images[self.img_index-1].codes
         else:

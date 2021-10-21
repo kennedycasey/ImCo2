@@ -84,14 +84,15 @@ class ImcoTkApp(object):
                 prompt="Reminder: Make sure to add commas between names if there are 2+ objects")
         self.object_name = Tk.Label(
                 self.info_frame,
-                text = "Your object names: " + self.object_entry,
+                text = "Your object name(s): " + self.object_entry,
                 fg = '#05976c',
                 bg = '#f6f6f6')
         self.object_name.pack(fill=Tk.X)
         self.session.img.object_name = self.object_entry
         if self.object_entry != '':
-            self.session.modified_images[self.session.img.path]=self.session.img
+            self.session.modified_images[self.session.img.path] = self.session.img
         self.object_entry_button.pack_forget()
+
 
     def build_comment_entry(self):
         self.comment_entry = simpledialog.askstring(
@@ -105,7 +106,7 @@ class ImcoTkApp(object):
         self.comments.pack(fill=Tk.X)
         self.session.img.comments = self.comment_entry
         if self.comment_entry != '':
-            self.session.modified_images[self.session.img.path]=self.session.img
+            self.session.modified_images[self.session.img.path] = self.session.img
         self.comment_entry_button.pack_forget()
 
     '''
@@ -114,24 +115,17 @@ class ImcoTkApp(object):
             img_lst = self.session.load_images(dir)
             for index in range(img_lst):
                 if img_lst[index].codes['Skipped']==1:
-                    self.session.set_image(index)
+                    self.session.next_image(index)
                     self.session.check_autosave()
                     self.draw_image()
-                    break  
-    '''    
+                    break
+    '''
 
+    #def build_comment_undo(self):
+        #self.comments.destroy()
+        #self.comment_entry_button.pack()
+        #self.comment_undo_button.pack(after=self.comment_entry_button)
 
-
-    def build_undo(self):
-        self.comments.destroy()
-        self.comment_entry_button.pack()
-        self.object_name.destroy()
-        self.object_entry_button.pack()
-        self.undo_button.pack(after=self.object_entry_button)
-        self.session.img.comments = ''
-        self.session.img.object_name = ''
-        self.session.modified_images[self.session.img.path]=self.session.img
-    
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
         self.root.config(bg=DEFAULT_BG)
@@ -179,7 +173,10 @@ class ImcoTkApp(object):
                 text = "Add object name(s)",
                 bg = DEFAULT_BG,
                 highlightbackground = DEFAULT_BG,
-                command = self.build_object_entry
+                #command = self.build_object_entry
+                command = lambda:[self.build_object_entry(),
+                    self.object_undo_button.pack(),
+                    self.object_entry_button.pack_forget()]
                 )
         self.object_entry_button.pack()
         self.comment_entry_button = Tk.Button(
@@ -187,17 +184,30 @@ class ImcoTkApp(object):
                 text = "Add comments",
                 bg = DEFAULT_BG,
                 highlightbackground = DEFAULT_BG,
-                command = self.build_comment_entry
+                command = lambda:[self.build_comment_entry(),
+                    self.comment_undo_button.pack(),
+                    self.comment_entry_button.pack_forget()]
                 )
         self.comment_entry_button.pack()
-        self.undo_button = Tk.Button(
+        self.comment_exists=False
+        self.object_undo_button = Tk.Button(
             self.info_frame,
-            text = 'Undo',
+            text = 'Undo object entry',
             bg = DEFAULT_BG,
             highlightbackground = DEFAULT_BG,
-            command = self.build_undo
+            command = lambda:[self.object_entry_button.pack(),
+                self.object_undo_button.pack_forget(),
+                self.object_name.destroy()]
         )
-        self.undo_button.pack()
+        self.comment_undo_button = Tk.Button(
+            self.info_frame,
+            text = 'Undo comment entry',
+            bg = DEFAULT_BG,
+            highlightbackground = DEFAULT_BG,
+            command = lambda:[self.comment_entry_button.pack(),
+                self.comment_undo_button.pack_forget(),
+                self.comments.destroy()]
+        )
         self.img_canvas = Tk.Canvas(
                 self.root,
                 bg=CANVAS_BG,
@@ -246,7 +256,8 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('Right'), self.handle_frontier)
 
     def handle_open(self, event=None):
-        path = tkinter.filedialog.askdirectory(parent=self.root)
+        path = tkinter.filedialog.askdirectory(initialdir = os.getcwd(),
+            parent=self.root)
         # TODO: Handle empty path, missing files, etc.
         self.open_workdir(path)
 
@@ -274,7 +285,6 @@ class ImcoTkApp(object):
     def handle_code(self, code, value):
         if self.session:
             self.session.code_image(code, value)
-            
 
     def handle_prev_image(self, event=None):
         if self.session is None:
@@ -308,15 +318,11 @@ class ImcoTkApp(object):
                 self.session.update_frontier()
             self.object_entry_button.pack(before=self.object_name)
             self.comment_entry_button.pack(before=self.object_name)
-            self.undo_button.pack(after=self.comment_entry_button)
-            self.comments.pack_forget()
+            self.object_undo_button.pack_forget()
+            self.comment_undo_button.pack_forget()
             self.object_name.pack_forget()
-            
-
-        
-        
-            
-
+            if not self.comment_exists:
+                self.comments.pack_forget()
 
     def handle_frontier(self, event=None):
         if self.session is None:
@@ -349,7 +355,6 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
-        #$self.imagemenu.entryconfig('Next Skipped Image', state=Tk.NORMAL)
 
     def draw_image(self):
         if self.photo_img is not None:
@@ -462,9 +467,6 @@ class CodeLabel(object):
             self.set_value(new_value)
         else:
             self.draw_label()
-
-   
-
 
 if sys.platform == 'darwin':
     META_BINDING = 'Command'

@@ -1,6 +1,7 @@
 import sqlite3
 import datetime
 
+
 class ImcoDb(object):
 
     def __init__(self, db_path, codes):
@@ -51,12 +52,10 @@ class ImcoDb(object):
     def first_image(self, codes):
         conn = self.get()
         curs = conn.cursor()
-        rows=curs.execute('SELECT * FROM codes;').fetchall()
+        rows = curs.execute('SELECT * from codes;').fetchall()
         if len(rows)==0:
-        #cols=len(rows[0])
-        #if cols < len(codes)+5:
-            curs.execute('ALTER TABLE "codes" ADD COLUMN Object')
-            curs.execute('ALTER TABLE "codes" ADD COLUMN Comments')
+                curs.execute('ALTER TABLE "codes" ADD COLUMN Object')
+                curs.execute('ALTER TABLE "codes" ADD COLUMN Comments')
         conn.commit()
 
     def store_image_rows(self, images, codes):
