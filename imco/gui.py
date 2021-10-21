@@ -88,6 +88,9 @@ class ImcoTkApp(object):
                 fg = '#05976c',
                 bg = '#f6f6f6')
         self.object_name.pack(fill=Tk.X)
+        self.session.img.object_name = self.object_entry
+        if self.object_entry != '':
+            self.session.modified_images[self.session.img.path] = self.session.img
         self.object_entry_button.pack_forget()
 
     #def build_object_undo(self):
@@ -105,8 +108,10 @@ class ImcoTkApp(object):
                 fg = '#05976c',
                 bg = '#f6f6f6')
         self.comments.pack(fill=Tk.X)
+        self.session.img.comments = self.comment_entry
+        if self.comment_entry != '':
+            self.session.modified_images[self.session.img.path] = self.session.img
         self.comment_entry_button.pack_forget()
-
 
     '''
     def next_skipped(self):
