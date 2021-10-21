@@ -1,5 +1,5 @@
 import sqlite3
-
+import datetime
 
 class ImcoDb(object):
 
@@ -52,14 +52,15 @@ class ImcoDb(object):
         conn = self.get()
         curs = conn.cursor()
         rows=curs.execute('SELECT * FROM codes;').fetchall()
-        cols = len(rows[0])
-        if cols < len(codes)+5:
+        if len(rows)==0:
+        #cols=len(rows[0])
+        #if cols < len(codes)+5:
             curs.execute('ALTER TABLE "codes" ADD COLUMN Object')
             curs.execute('ALTER TABLE "codes" ADD COLUMN Comments')
         conn.commit()
 
     def store_image_rows(self, images, codes):
-        self.first_image(codes)
+        #self.first_image(codes)
         conn = self.get()
         curs = conn.cursor()
         code_columns = [c.code for c in codes]
@@ -69,6 +70,8 @@ class ImcoDb(object):
                VALUES ({})'''.format(columns_str, qmarks)
         values = []
         for img in images:
+            if img._modified == None:
+                img._modified = datetime.datetime.now()
             code_values = [c.to_db(img.codes[c.code]) for c in codes]
             v = tuple([img.dir, img.name, img.timestamp, img.object_name, img.comments] + code_values)
             values.append(v)
@@ -92,8 +95,8 @@ class ImcoDb(object):
                 Dir TEXT,
                 Image TEXT,
                 Modified TEXT CURRENT_TIMESTAMP,
-                Object TEXT
-                Comments TEXT
+                Object TEXT,
+                Comments TEXT,
                 {},
                 PRIMARY KEY (Dir, Image)
             )'''.format(col_defs)

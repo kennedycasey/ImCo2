@@ -97,6 +97,7 @@ class ImcoSession(object):
             return False
         self.set_image(self.img_index + 1)
         self.check_autosave()
+        #self.save()
         return True
 
     def jump_to_frontier_image(self):

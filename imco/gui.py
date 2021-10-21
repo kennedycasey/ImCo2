@@ -108,6 +108,19 @@ class ImcoTkApp(object):
             self.session.modified_images[self.session.img.path]=self.session.img
         self.comment_entry_button.pack_forget()
 
+    '''
+    def next_skipped(self):
+        for dir in self.session.dirs:
+            img_lst = self.session.load_images(dir)
+            for index in range(img_lst):
+                if img_lst[index].codes['Skipped']==1:
+                    self.session.set_image(index)
+                    self.session.check_autosave()
+                    self.draw_image()
+                    break  
+    '''    
+
+
 
     def build_undo(self):
         self.comments.destroy()
@@ -336,6 +349,7 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
+        #$self.imagemenu.entryconfig('Next Skipped Image', state=Tk.NORMAL)
 
     def draw_image(self):
         if self.photo_img is not None:
