@@ -319,12 +319,18 @@ class ImcoTkApp(object):
             self.draw_image()
             if not self.session.img_coded():
                 self.session.update_frontier()
-            self.object_entry_button.pack(before=self.object_name)
-            self.comment_entry_button.pack(before=self.object_name)
+            self.object_entry_button.pack()
+            self.comment_entry_button.pack()
             self.object_undo_button.pack_forget()
             self.comment_undo_button.pack_forget()
-            self.comments.pack_forget()
-            self.object_name.pack_forget()
+            try:
+                self.comments.pack_forget()
+            except AttributeError:
+                pass
+            try:
+                self.object_name.pack_forget()
+            except AttributeError:
+                pass
 
     def handle_frontier(self, event=None):
         if self.session is None:
