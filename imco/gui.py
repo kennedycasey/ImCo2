@@ -63,7 +63,7 @@ class ImcoTkApp(object):
         self.menubar.add_cascade(label='Image', menu=self.imagemenu)
         self.imagemenu.add_command(
                 label='Previous',
-                command=self.handle_next_image,
+                command=self.handle_prev_image,
                 accelerator='Left',
                 state=Tk.DISABLED)
         self.imagemenu.add_command(

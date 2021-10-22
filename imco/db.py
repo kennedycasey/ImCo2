@@ -49,14 +49,6 @@ class ImcoDb(object):
         curs.execute(q, args)
         return curs
 
-    def first_image(self, codes):
-        conn = self.get()
-        curs = conn.cursor()
-        rows = curs.execute('SELECT * from codes;').fetchall()
-        if len(rows)==0:
-                curs.execute('ALTER TABLE "codes" ADD COLUMN Object')
-                curs.execute('ALTER TABLE "codes" ADD COLUMN Comments')
-        conn.commit()
 
     def store_image_rows(self, images, codes):
         conn = self.get()
