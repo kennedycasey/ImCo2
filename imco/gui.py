@@ -76,6 +76,14 @@ class ImcoTkApp(object):
                 command=self.handle_frontier,
                 accelerator=meta_accelerator('Right'),
                 state=Tk.DISABLED)
+        self.imagemenu.add_command(
+                label='Next Skipped',
+                command=self.handle_next_skipped,
+                state=Tk.DISABLED)
+        self.imagemenu.add_command(
+                label='Prev Skipped',
+                command=self.handle_prev_skipped,
+                state=Tk.DISABLED)
         self.root.config(menu=self.menubar)
 
     def build_object_entry(self):
@@ -93,13 +101,6 @@ class ImcoTkApp(object):
             self.session.modified_images[self.session.img.path] = self.session.img
         self.object_entry_button.pack_forget()
 
-<<<<<<< HEAD
-=======
-    #def build_object_undo(self):
-        #self.object_name.destroy()
-        #self.object_entry_button.pack()
-        #self.object_undo_button.pack(after=self.object_entry_button)
->>>>>>> 8bf2a0cd3a44ff3a4f83d5c8d371346c5b8151f0
 
     def build_comment_entry(self):
         self.comment_entry = simpledialog.askstring(
@@ -116,22 +117,6 @@ class ImcoTkApp(object):
             self.session.modified_images[self.session.img.path] = self.session.img
         self.comment_entry_button.pack_forget()
 
-    '''
-    def next_skipped(self):
-        for dir in self.session.dirs:
-            img_lst = self.session.load_images(dir)
-            for index in range(img_lst):
-                if img_lst[index].codes['Skipped']==1:
-                    self.session.next_image(index)
-                    self.session.check_autosave()
-                    self.draw_image()
-                    break
-    '''
-
-    #def build_comment_undo(self):
-        #self.comments.destroy()
-        #self.comment_entry_button.pack()
-        #self.comment_undo_button.pack(after=self.comment_entry_button)
 
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
@@ -196,10 +181,7 @@ class ImcoTkApp(object):
                     self.comment_entry_button.pack_forget()]
                 )
         self.comment_entry_button.pack()
-<<<<<<< HEAD
         self.comment_exists=False
-=======
->>>>>>> 8bf2a0cd3a44ff3a4f83d5c8d371346c5b8151f0
         self.object_undo_button = Tk.Button(
             self.info_frame,
             text = 'Undo object entry',
@@ -326,15 +308,6 @@ class ImcoTkApp(object):
             self.draw_image()
             if not self.session.img_coded():
                 self.session.update_frontier()
-<<<<<<< HEAD
-            self.object_entry_button.pack(before=self.object_name)
-            self.comment_entry_button.pack(before=self.object_name)
-            self.object_undo_button.pack_forget()
-            self.comment_undo_button.pack_forget()
-            self.object_name.pack_forget()
-            if not self.comment_exists:
-                self.comments.pack_forget()
-=======
             self.object_entry_button.pack()
             self.comment_entry_button.pack()
             self.object_undo_button.pack_forget()
@@ -347,7 +320,6 @@ class ImcoTkApp(object):
                 self.object_name.pack_forget()
             except AttributeError:
                 pass
->>>>>>> 8bf2a0cd3a44ff3a4f83d5c8d371346c5b8151f0
 
     def handle_frontier(self, event=None):
         if self.session is None:
@@ -355,11 +327,27 @@ class ImcoTkApp(object):
         self.session.jump_to_frontier_image()
         self.draw_image()
 
-    def handle_prev_skipped(self, event):
-        pass
+    def handle_prev_skipped(self):
+        #for dir in self.session.dirs:
+        img_lst = self.session.load_images(self.session.dir)
+        for index in range(self.session.img_index):
+            if img_lst[index].codes['Skipped']!=None:
+                self.session.img_index = index-1
+                self.handle_next_image()
+                break
 
-    def handle_next_skipped(self, event):
-        pass
+    def handle_next_skipped(self):
+        #for dir_index, dir in enumerate(self.session.dirs):
+            #if dir_index>=self.session.self.dir_order[dir_index]:
+        img_lst = self.session.load_images(self.session.dir)
+        for index in range(self.session.img_index+1, len(img_lst)):
+            if img_lst[index].codes['Skipped']!=None:
+                self.session.img_index = index-1
+                self.handle_next_image()
+                break
+            
+            
+            
 
     def open_workdir(self, path):
         try:
@@ -380,6 +368,8 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
+        self.imagemenu.entryconfig('Next Skipped', state=Tk.NORMAL)
+        self.imagemenu.entryconfig('Prev Skipped', state=Tk.NORMAL)
 
     def draw_image(self):
         if self.photo_img is not None:
