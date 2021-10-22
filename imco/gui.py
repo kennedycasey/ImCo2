@@ -7,6 +7,7 @@ import tkinter.font
 import atexit
 import os
 import sys
+import re
 
 from imco.version import VERSION
 from imco.session import ImcoSession
@@ -51,6 +52,10 @@ class ImcoTkApp(object):
                 command=self.handle_open,
                 accelerator=meta_accelerator('O'))
         self.filemenu.add_command(
+                label='Open specific image',
+                command=self.handle_open_image,
+                accelerator=meta_accelerator('I'))
+        self.filemenu.add_command(
                 label='Save',
                 command=self.handle_save,
                 accelerator=meta_accelerator('S'),
@@ -93,11 +98,6 @@ class ImcoTkApp(object):
             self.session.modified_images[self.session.img.path] = self.session.img
         self.object_entry_button.pack_forget()
 
-    #def build_object_undo(self):
-        #self.object_name.destroy()
-        #self.object_entry_button.pack()
-        #self.object_undo_button.pack(after=self.object_entry_button)
-
     def build_comment_entry(self):
         self.comment_entry = simpledialog.askstring(
                 title="Add comments",
@@ -112,23 +112,6 @@ class ImcoTkApp(object):
         if self.comment_entry != '':
             self.session.modified_images[self.session.img.path] = self.session.img
         self.comment_entry_button.pack_forget()
-
-    '''
-    def next_skipped(self):
-        for dir in self.session.dirs:
-            img_lst = self.session.load_images(dir)
-            for index in range(img_lst):
-                if img_lst[index].codes['Skipped']==1:
-                    self.session.next_image(index)
-                    self.session.check_autosave()
-                    self.draw_image()
-                    break
-    '''
-
-    #def build_comment_undo(self):
-        #self.comments.destroy()
-        #self.comment_entry_button.pack()
-        #self.comment_undo_button.pack(after=self.comment_entry_button)
 
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
@@ -152,6 +135,13 @@ class ImcoTkApp(object):
                 justify=Tk.LEFT,
                 bg=DEFAULT_BG)
         self.path_label.pack(fill=Tk.X)
+        #self.image_select_button = Tk.Button(
+            #self.info_frame,
+            #text = "Open specific image",
+            #bg = DEFAULT_BG,
+            #highlightbackground = DEFAULT_BG,
+            #command = self.build_image_select)
+        #self.image_select_button.pack()
         self.codes_section_label = Tk.Label(
                 self.info_frame,
                 anchor=Tk.W,
@@ -256,6 +246,7 @@ class ImcoTkApp(object):
         self.root.bind('<Shift-Right>', self.handle_next_skipped)
         self.root.bind(meta_binding('s'), self.handle_save)
         self.root.bind(meta_binding('o'), self.handle_open)
+        self.root.bind(meta_binding('i'), self.handle_open_image)
         self.root.bind(meta_binding('Right'), self.handle_frontier)
 
     def handle_open(self, event=None):
@@ -263,6 +254,17 @@ class ImcoTkApp(object):
             parent=self.root)
         # TODO: Handle empty path, missing files, etc.
         self.open_workdir(path)
+
+    def handle_open_image(self, event=None):
+        try:
+            self.selected_image.destroy()
+        except AttributeError:
+            pass
+        self.selected_image=tkinter.filedialog.askopenfilename(
+                    initialdir = os.getcwd(),
+                    filetypes=[("image", "*.gif")],
+                    parent=self.root)
+        self.draw_image()
 
     def handle_save(self, event=None):
         if self.session is not None:
@@ -324,6 +326,10 @@ class ImcoTkApp(object):
             self.object_undo_button.pack_forget()
             self.comment_undo_button.pack_forget()
             try:
+                self.selected_image.destroy()
+            except AttributeError:
+                pass
+            try:
                 self.comments.pack_forget()
             except AttributeError:
                 pass
@@ -365,16 +371,26 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
 
     def draw_image(self):
-        if self.photo_img is not None:
-            self.img_canvas.delete(self.photo_img)
-        self.photo_img = Tk.PhotoImage(file=self.session.img.path)
-        x = self.session.config.image_max_x / 2 - 1
-        y = self.session.config.image_max_y / 2 - 1
-        self.img_canvas.create_image(x, y, image=self.photo_img)
-        self.path_label.config(text=self.session.img_path)
-        for code_label in self.code_labels:
-            code_label.set_from_image(self.session.img)
-
+        try:
+            self.photo_img = Tk.PhotoImage(file=self.selected_image)
+            x = self.session.config.image_max_x / 2 - 1
+            y = self.session.config.image_max_y / 2 - 1
+            self.img_canvas.create_image(x, y, image=self.photo_img)
+            self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
+            # TO DO: need to recognize match between files with same path,
+            # then update code values accordingly
+            #for code_label in self.code_labels:
+                #code_label.set_from_image(re.sub('^(.*images/)', '', self.selected_image))
+        except AttributeError:
+            if self.photo_img is not None:
+                self.img_canvas.delete(self.photo_img)
+            self.photo_img = Tk.PhotoImage(file=self.session.img.path)
+            x = self.session.config.image_max_x / 2 - 1
+            y = self.session.config.image_max_y / 2 - 1
+            self.img_canvas.create_image(x, y, image=self.photo_img)
+            self.path_label.config(text=self.session.img_path)
+            for code_label in self.code_labels:
+                code_label.set_from_image(self.session.img)
 
 class CodeLabel(object):
     UNSET_COLOR = '#8a8a8a'   # grey
