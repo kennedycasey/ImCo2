@@ -194,6 +194,8 @@ class ImcoImage(object):
             value = self.codes.get(code.code)
             if code.exception and value is not None:
                 return True
+            elif code.exception and value is None and self.object_name=='':
+                missing_required = True
             elif code.required and value is None:
                 missing_required = True
         return not missing_required
