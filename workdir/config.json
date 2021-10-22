@@ -42,11 +42,6 @@
           "key": "P"
       },
       {
-          "code": "Furniture",
-          "label": "Furniture",
-          "key": "F"
-      },
-      {
           "code": "Animal",
           "label": "Animal",
           "key": "A"
