@@ -1,6 +1,7 @@
 import tkinter as Tk
 from tkinter import Toplevel
 from tkinter import simpledialog
+from PIL import Image
 import tkinter.messagebox as tkmb
 import tkinter.filedialog
 import tkinter.font
@@ -8,6 +9,7 @@ import atexit
 import os
 import sys
 import re
+import webbrowser
 
 from imco.version import VERSION
 from imco.session import ImcoSession
@@ -55,6 +57,10 @@ class ImcoTkApp(object):
                 label='Open specific image',
                 command=self.handle_open_image,
                 accelerator=meta_accelerator('I'))
+        self.filemenu.add_command(
+                label='View context',
+                command=self.handle_open_context,
+                accelerator=meta_accelerator('C'))
         self.filemenu.add_command(
                 label='Save',
                 command=self.handle_save,
@@ -247,6 +253,7 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('s'), self.handle_save)
         self.root.bind(meta_binding('o'), self.handle_open)
         self.root.bind(meta_binding('i'), self.handle_open_image)
+        self.root.bind(meta_binding('c'), self.handle_open_context)
         self.root.bind(meta_binding('Right'), self.handle_frontier)
 
     def handle_open(self, event=None):
@@ -265,6 +272,15 @@ class ImcoTkApp(object):
                     filetypes=[("image", "*.gif")],
                     parent=self.root)
         self.draw_image()
+
+    def handle_open_context(self, event=None):
+        context_path = tkinter.filedialog.askdirectory(initialdir = os.getcwd(),
+            parent=self.root)
+        current_image_path = self.session.img.path
+        context_image_path = context_path + '/' + re.sub('.*/', '', current_image_path)
+        webbrowser.open(context_path)
+        #load = Image.open(context_image_path)
+        #render = Tk.PhotoImage(load)
 
     def handle_save(self, event=None):
         if self.session is not None:
