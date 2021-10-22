@@ -87,6 +87,14 @@ class ImcoTkApp(object):
                 command=self.handle_frontier,
                 accelerator=meta_accelerator('Right'),
                 state=Tk.DISABLED)
+        self.imagemenu.add_command(
+            label='Next Skipped',
+            command=self.handle_next_skipped,
+            state=Tk.Disabled)
+        self.imagemenu.add_command(
+            label='Previous Skipped',
+            command=self.handle_prev_skipped,
+            state=Tk.Disabled)
         self.root.config(menu=self.menubar)
 
     def build_object_entry(self):
@@ -361,10 +369,20 @@ class ImcoTkApp(object):
         self.draw_image()
 
     def handle_prev_skipped(self, event):
-        pass
+        img_lst = self.session.load_images(self.session.dir)
+        for index in range(self.session.img_index):
+            if img_lst[index].codes['Skipped'] != None:
+                self.session.img_index = index-1
+                self.handle_next_image()
+                break
 
     def handle_next_skipped(self, event):
-        pass
+        img_lst = self.session.load_images(self.session.dir)
+        for index in range(self.session.img_index+1, len(img_lst)):
+            if img_lst[index].codes['Skipped'] != None:
+                self.session.img_index = index-1
+                self.handle_next_image()
+                break
 
     def open_workdir(self, path):
         try:
@@ -385,6 +403,8 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
+        self.imagemenu.entryconfig('Next Skipped', state=Tk.NORMAL)
+        self.imagemenu.entryconfig('Previous Skipped', state=Tk.NORMAL)
 
     def draw_image(self):
         try:
