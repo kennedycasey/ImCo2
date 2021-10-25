@@ -1,7 +1,6 @@
 import tkinter as Tk
 from tkinter import Toplevel
 from tkinter import simpledialog
-from PIL import Image
 import tkinter.messagebox as tkmb
 import tkinter.filedialog
 import tkinter.font
