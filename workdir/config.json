@@ -7,18 +7,44 @@
           "exception": true
       },
       {
+          "code": "StudyRelated",
+          "label": "Study-related object",
+          "key": "X"
+      },
+      {
           "code": "Food",
-          "label": "Food/drink",
+          "label": "Food",
           "key": "F"
       },
       {
           "code": "Clothing",
+          "label": "Clothing",
           "key": "C"
       },
       {
-          "code": "Lens",
-          "label": "Camera lens",
-          "key": "L"
+          "code": "Toy",
+          "label": "Toy",
+          "key": "T"
+      },
+      {
+          "code": "Book",
+          "label": "Book",
+          "key": "B"
+      },
+      {
+          "code": "Electronic",
+          "label": "Electronic device (not study-related)",
+          "key": "E"
+      },
+      {
+          "code": "Plant",
+          "label": "Plant",
+          "key": "P"
+      },
+      {
+          "code": "Animal",
+          "label": "Animal",
+          "key": "A"
       },
       {
           "code": "ToolWork",
@@ -36,35 +62,12 @@
           "key": "H"
       },
       {
-          "code": "Toy",
-          "label": "Toy (e.g., ball/doll)",
-          "key": "T"
-      },
-      {
-          "code": "Book",
-          "label": "Book/paper",
-          "key": "B"
-      },
-      {
-          "code": "Animal",
-          "key": "A"
-      },
-      {
-          "code": "Phone",
-          "key": "P"
-      },
-      {
-          "code": "OtherElectronic",
-          "label": "Other electronic device (e.g., TV/radio)",
-          "key": "E"
-      },
-      {
-          "code": "OtherObjectSynthetic",
+          "code": "OtherSynthetic",
           "label": "Other object (synthetic/manmade)",
           "key": "S"
       },
       {
-          "code": "OtherObjectNatural",
+          "code": "OtherNatural",
           "label": "Other object (natural)",
           "key": "N"
       },

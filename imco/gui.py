@@ -7,6 +7,8 @@ import tkinter.font
 import atexit
 import os
 import sys
+import re
+import webbrowser
 
 from imco.version import VERSION
 from imco.session import ImcoSession
@@ -31,6 +33,8 @@ class ImcoTkApp(object):
         self.code_labels = []
         # The PhotoImage instance for the currently-displayed image.
         self.photo_img = None
+        self.selected_image = None
+        self.prev_selected_image = None
         self.build_menu()
         self.build_main_window()
         self.install_bindings()
@@ -50,6 +54,14 @@ class ImcoTkApp(object):
                 label='Open',
                 command=self.handle_open,
                 accelerator=meta_accelerator('O'))
+        self.filemenu.add_command(
+                label='Open specific image',
+                command=self.handle_open_image,
+                accelerator=meta_accelerator('I'))
+        self.filemenu.add_command(
+                label='View context',
+                command=self.handle_open_context,
+                accelerator=meta_accelerator('C'))
         self.filemenu.add_command(
                 label='Save',
                 command=self.handle_save,
@@ -77,13 +89,13 @@ class ImcoTkApp(object):
                 accelerator=meta_accelerator('Right'),
                 state=Tk.DISABLED)
         self.imagemenu.add_command(
-                label='Next Skipped',
-                command=self.handle_next_skipped,
-                state=Tk.DISABLED)
+            label='Next Skipped',
+            command=self.handle_next_skipped,
+            state=Tk.DISABLED)
         self.imagemenu.add_command(
-                label='Prev Skipped',
-                command=self.handle_prev_skipped,
-                state=Tk.DISABLED)
+            label='Previous Skipped',
+            command=self.handle_prev_skipped,
+            state=Tk.DISABLED)
         self.root.config(menu=self.menubar)
 
     def build_object_entry(self):
@@ -101,7 +113,6 @@ class ImcoTkApp(object):
             self.session.modified_images[self.session.img.path] = self.session.img
         self.object_entry_button.pack_forget()
 
-
     def build_comment_entry(self):
         self.comment_entry = simpledialog.askstring(
                 title="Add comments",
@@ -116,7 +127,6 @@ class ImcoTkApp(object):
         if self.comment_entry != '':
             self.session.modified_images[self.session.img.path] = self.session.img
         self.comment_entry_button.pack_forget()
-
 
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
@@ -140,6 +150,13 @@ class ImcoTkApp(object):
                 justify=Tk.LEFT,
                 bg=DEFAULT_BG)
         self.path_label.pack(fill=Tk.X)
+        #self.image_select_button = Tk.Button(
+            #self.info_frame,
+            #text = "Open specific image",
+            #bg = DEFAULT_BG,
+            #highlightbackground = DEFAULT_BG,
+            #command = self.build_image_select)
+        #self.image_select_button.pack()
         self.codes_section_label = Tk.Label(
                 self.info_frame,
                 anchor=Tk.W,
@@ -245,6 +262,8 @@ class ImcoTkApp(object):
         self.root.bind('<Shift-Right>', self.handle_next_skipped)
         self.root.bind(meta_binding('s'), self.handle_save)
         self.root.bind(meta_binding('o'), self.handle_open)
+        self.root.bind(meta_binding('i'), self.handle_open_image)
+        self.root.bind(meta_binding('c'), self.handle_open_context)
         self.root.bind(meta_binding('Right'), self.handle_frontier)
 
     def handle_open(self, event=None):
@@ -252,6 +271,35 @@ class ImcoTkApp(object):
             parent=self.root)
         # TODO: Handle empty path, missing files, etc.
         self.open_workdir(path)
+
+    def handle_open_image(self, event=None):
+        try:
+            self.selected_image.destroy()
+        except AttributeError:
+            pass
+        self.selected_image=tkinter.filedialog.askopenfilename(
+                    initialdir = os.getcwd(),
+                    filetypes=[("image", "*.gif")],
+                    parent=self.root)
+        self.handle_save()
+        for dir in self.session.dirs:
+            img_lst = self.session.load_images(dir)
+            for index in range(len(img_lst)):
+                if img_lst[index].path==self.selected_image:
+                    self.session.img_index = index-1
+                    self.handle_next_image()
+                    break
+            break
+        #self.draw_image()
+
+    def handle_open_context(self, event=None):
+        context_path = tkinter.filedialog.askdirectory(initialdir = os.getcwd(),
+            parent=self.root)
+        current_image_path = self.session.img.path
+        context_image_path = context_path + '/' + re.sub('.*/', '', current_image_path)
+        webbrowser.open(context_path)
+        #load = Image.open(context_image_path)
+        #render = Tk.PhotoImage(load)
 
     def handle_save(self, event=None):
         if self.session is not None:
@@ -305,6 +353,9 @@ class ImcoTkApp(object):
             tkmb.showinfo('R U SRS???',
                     "You reached the end! You're a coding god!")
         if update_image:
+            if self.prev_selected_image != None:
+                if self.prev_selected_image == self.selected_image:
+                    self.selected_image = None
             self.draw_image()
             if not self.session.img_coded():
                 self.session.update_frontier()
@@ -327,27 +378,21 @@ class ImcoTkApp(object):
         self.session.jump_to_frontier_image()
         self.draw_image()
 
-    def handle_prev_skipped(self):
-        #for dir in self.session.dirs:
+    def handle_prev_skipped(self, event=None):
         img_lst = self.session.load_images(self.session.dir)
         for index in range(self.session.img_index):
-            if img_lst[index].codes['Skipped']!=None:
+            if img_lst[index].codes['Skipped'] != None:
                 self.session.img_index = index-1
                 self.handle_next_image()
                 break
 
-    def handle_next_skipped(self):
-        #for dir_index, dir in enumerate(self.session.dirs):
-            #if dir_index>=self.session.self.dir_order[dir_index]:
+    def handle_next_skipped(self, event=None):
         img_lst = self.session.load_images(self.session.dir)
         for index in range(self.session.img_index+1, len(img_lst)):
-            if img_lst[index].codes['Skipped']!=None:
+            if img_lst[index].codes['Skipped'] != None:
                 self.session.img_index = index-1
                 self.handle_next_image()
                 break
-            
-            
-            
 
     def open_workdir(self, path):
         try:
@@ -369,19 +414,32 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next Skipped', state=Tk.NORMAL)
-        self.imagemenu.entryconfig('Prev Skipped', state=Tk.NORMAL)
+        self.imagemenu.entryconfig('Previous Skipped', state=Tk.NORMAL)
 
     def draw_image(self):
-        if self.photo_img is not None:
-            self.img_canvas.delete(self.photo_img)
-        self.photo_img = Tk.PhotoImage(file=self.session.img.path)
-        x = self.session.config.image_max_x / 2 - 1
-        y = self.session.config.image_max_y / 2 - 1
-        self.img_canvas.create_image(x, y, image=self.photo_img)
-        self.path_label.config(text=self.session.img_path)
-        for code_label in self.code_labels:
-            code_label.set_from_image(self.session.img)
-
+        #try:
+        if self.selected_image is not None:
+            self.photo_img = Tk.PhotoImage(file=self.selected_image)
+            x = self.session.config.image_max_x / 2 - 1
+            y = self.session.config.image_max_y / 2 - 1
+            self.img_canvas.create_image(x, y, image=self.photo_img)
+            self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
+            self.prev_selected_image=self.selected_image
+            # TO DO: need to recognize match between files with same path,
+            # then update code values accordingly
+            #for code_label in self.code_labels:
+                #code_label.set_from_image(re.sub('^(.*images/)', '', self.selected_image))
+        #except AttributeError:
+        else:
+            if self.photo_img is not None:
+                self.img_canvas.delete(self.photo_img)
+            self.photo_img = Tk.PhotoImage(file=self.session.img.path)
+            x = self.session.config.image_max_x / 2 - 1
+            y = self.session.config.image_max_y / 2 - 1
+            self.img_canvas.create_image(x, y, image=self.photo_img)
+            self.path_label.config(text=self.session.img_path)
+            for code_label in self.code_labels:
+                code_label.set_from_image(self.session.img)
 
 class CodeLabel(object):
     UNSET_COLOR = '#8a8a8a'   # grey

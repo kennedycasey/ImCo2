@@ -111,10 +111,9 @@ class ImcoSession(object):
         self.img.code(code, value)
         if self.img.is_coded(self.config.codes):
             if self.img.codes['Repeated'] is not None:
-                self.img.codes = self.dir.images[self.img_index-1].codes
-                self.img.comments = self.dir.images[self.img_index-1].comments
-                self.img.object_name = self.dir.images[self.img_index-1].object_name
-            # We only record codes once they're complete.
+                self.img.codes = self.dir._images[self.img_index-1].codes
+                self.img.comments = self.dir._images[self.img_index-1].comments
+                self.img.object_name = self.dir._images[self.img_index-1].object_name
             self.modified_images[self.img.path] = self.img
 
 
@@ -195,6 +194,8 @@ class ImcoImage(object):
             value = self.codes.get(code.code)
             if code.exception and value is not None:
                 return True
+            elif code.exception and value is None and self.object_name=='':
+                missing_required = True
             elif code.required and value is None:
                 missing_required = True
         return not missing_required
