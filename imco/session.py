@@ -3,6 +3,7 @@ import datetime
 import glob
 import os
 import random
+import re
 
 from imco.config import ImcoConfig
 from imco.db import ImcoDb
@@ -52,7 +53,7 @@ class ImcoSession(object):
         return glob.glob(self.path(*components))
 
     def load_images(self, imco_dir):
-        paths = glob.glob(os.path.join(imco_dir.path, self.config.image_glob))
+        paths = sorted(glob.glob(os.path.join(imco_dir.path, self.config.image_glob)))
         img_rows = self.db.load_image_rows(imco_dir.name)
         images = []
         for path in paths:
