@@ -3,6 +3,7 @@ import datetime
 import glob
 import os
 import random
+import re
 
 from imco.config import ImcoConfig
 from imco.db import ImcoDb
@@ -57,10 +58,12 @@ class ImcoSession(object):
         images = []
         for path in paths:
             img = ImcoImage(path, self.config.codes)
+            img.number = re.findall('\/([0-9]+)(?=[^\/]*$)', img.path)
             row = img_rows.get(img.name)
             if row is not None:
                 img.fill_from_db_row(row, self.config.codes)
             images.append(img)
+            images.sort(key= lambda x: x.number)
         return images
 
     def set_dir(self, index):
@@ -166,6 +169,7 @@ class ImcoImage(object):
         self.codes = dict((c.code, None) for c in codes)
         self.comments = ''
         self.object_name = ''
+        self.number = 0
 
     @property
     def timestamp(self):
