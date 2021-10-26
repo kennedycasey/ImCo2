@@ -281,16 +281,16 @@ class ImcoTkApp(object):
                     initialdir = os.getcwd(),
                     filetypes=[("image", "*.gif")],
                     parent=self.root)
-        self.handle_save()
-        for dir in self.session.dirs:
-            img_lst = self.session.load_images(dir)
-            for index in range(len(img_lst)):
-                if img_lst[index].path==self.selected_image:
-                    self.session.img_index = index-1
-                    self.handle_next_image()
-                    break
-            break
-        #self.draw_image()
+        self.session.save()
+        #for dir in self.session.dirs:
+        img_lst = self.session.load_images(self.session.dir)
+        for index in range(len(img_lst)):
+            if img_lst[index].path==self.selected_image:
+                self.session.img_index = index-1
+                self.handle_next_image()
+                break
+            #break
+        self.draw_image()
 
     def handle_open_context(self, event=None):
         context_path = tkinter.filedialog.askdirectory(initialdir = os.getcwd(),
