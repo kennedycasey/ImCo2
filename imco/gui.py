@@ -301,7 +301,7 @@ class ImcoTkApp(object):
         #load = Image.open(context_image_path)
         #render = Tk.PhotoImage(load)
 
-    def handle_save(self, event=None):
+    def handle_save(self):
         if self.session is not None:
             self.session.save()
 
@@ -331,11 +331,56 @@ class ImcoTkApp(object):
             return
         if self.session.prev_image():
             self.draw_image()
+            self.formatting()
         elif self.session.prev_dir():
             tkmb.showinfo('', 'Going back to previous directory.')
             self.draw_image()
+            self.formatting()
         else:
             tkmb.showinfo('', 'This is the very first image.')
+
+
+
+    def prev_text(self):
+
+        if self.session.img.object_name != '':
+            self.object_name = Tk.Label(
+                self.info_frame,
+                text = "Your object name(s): " + self.session.img.object_name,
+                fg = '#05976c',
+                bg = '#f6f6f6')
+            self.object_name.pack(fill=Tk.X)
+            self.object_undo_button.pack(),
+            self.object_entry_button.pack_forget()
+
+        if self.session.img.comments != '':
+            self.comments = Tk.Label(
+                self.info_frame,
+                text = "Your comments: " + self.session.img.comments,
+                fg = '#05976c',
+                bg = '#f6f6f6')
+            self.comments.pack(fill=Tk.X)
+            self.comment_undo_button.pack()
+            self.comment_entry_button.pack_forget()
+        
+
+    def formatting(self):
+
+        if not self.session.img_coded():
+                self.session.update_frontier()
+        self.object_entry_button.pack()
+        self.comment_entry_button.pack()
+        self.object_undo_button.pack_forget()
+        self.comment_undo_button.pack_forget()
+        try:
+            self.comments.pack_forget()
+        except AttributeError:
+            pass
+        try:
+            self.object_name.pack_forget()
+        except AttributeError:
+            pass
+        self.prev_text()
 
     def handle_next_image(self, event=None):
         if self.session is None:
@@ -350,27 +395,24 @@ class ImcoTkApp(object):
             tkmb.showinfo('', "Hooray! It's a brand new directory.")
             update_image = True
         else:
-            tkmb.showinfo('R U SRS???',
-                    "You reached the end! You're a coding god!")
+            finished=True
+            for dir in self.session.dirs:
+                img_lst = self.session.load_images(dir)
+                for img in img_lst:
+                    if img.codes['Skipped'] is not None or not img.is_coded:
+                        finished=False
+                        tkmb.showinfo("Almost Done!","Remember to code skipped images")
+                        break
+                break
+            if finished:
+                tkmb.showinfo('R U SRS???',
+                        "You reached the end! You're a coding god!")
         if update_image:
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
                     self.selected_image = None
             self.draw_image()
-            if not self.session.img_coded():
-                self.session.update_frontier()
-            self.object_entry_button.pack()
-            self.comment_entry_button.pack()
-            self.object_undo_button.pack_forget()
-            self.comment_undo_button.pack_forget()
-            try:
-                self.comments.pack_forget()
-            except AttributeError:
-                pass
-            try:
-                self.object_name.pack_forget()
-            except AttributeError:
-                pass
+            self.formatting()
 
     def handle_frontier(self, event=None):
         if self.session is None:
@@ -378,15 +420,15 @@ class ImcoTkApp(object):
         self.session.jump_to_frontier_image()
         self.draw_image()
 
-    def handle_prev_skipped(self, event=None):
+    def handle_prev_skipped(self):
         img_lst = self.session.load_images(self.session.dir)
-        for index in range(self.session.img_index):
+        for index in reversed(range(self.session.img_index)):
             if img_lst[index].codes['Skipped'] != None:
                 self.session.img_index = index-1
                 self.handle_next_image()
                 break
 
-    def handle_next_skipped(self, event=None):
+    def handle_next_skipped(self):
         img_lst = self.session.load_images(self.session.dir)
         for index in range(self.session.img_index+1, len(img_lst)):
             if img_lst[index].codes['Skipped'] != None:
