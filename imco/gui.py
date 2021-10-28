@@ -111,6 +111,7 @@ class ImcoTkApp(object):
         self.session.img.object_name = self.object_entry
         if self.object_entry != '':
             self.session.modified_images[self.session.img.path] = self.session.img
+            self.session.save()
         self.object_entry_button.pack_forget()
 
     def build_comment_entry(self):
@@ -126,6 +127,7 @@ class ImcoTkApp(object):
         self.session.img.comments = self.comment_entry
         if self.comment_entry != '':
             self.session.modified_images[self.session.img.path] = self.session.img
+            self.session.save()
         self.comment_entry_button.pack_forget()
 
     def build_main_window(self):
@@ -290,7 +292,6 @@ class ImcoTkApp(object):
                 self.handle_next_image()
                 break
             #break
-        self.draw_image()
 
     def handle_open_context(self, event=None):
         context_path = tkinter.filedialog.askdirectory(initialdir = os.getcwd(),
@@ -339,10 +340,7 @@ class ImcoTkApp(object):
         else:
             tkmb.showinfo('', 'This is the very first image.')
 
-
-
     def prev_text(self):
-
         if self.session.img.object_name != '':
             self.object_name = Tk.Label(
                 self.info_frame,
@@ -350,7 +348,7 @@ class ImcoTkApp(object):
                 fg = '#05976c',
                 bg = '#f6f6f6')
             self.object_name.pack(fill=Tk.X)
-            self.object_undo_button.pack(),
+            self.object_undo_button.pack()
             self.object_entry_button.pack_forget()
 
         if self.session.img.comments != '':
@@ -362,22 +360,20 @@ class ImcoTkApp(object):
             self.comments.pack(fill=Tk.X)
             self.comment_undo_button.pack()
             self.comment_entry_button.pack_forget()
-        
 
     def formatting(self):
-
         if not self.session.img_coded():
-                self.session.update_frontier()
+            self.session.update_frontier()
         self.object_entry_button.pack()
         self.comment_entry_button.pack()
         self.object_undo_button.pack_forget()
         self.comment_undo_button.pack_forget()
         try:
-            self.comments.pack_forget()
+            self.object_name.pack_forget()
         except AttributeError:
             pass
         try:
-            self.object_name.pack_forget()
+            self.comments.pack_forget()
         except AttributeError:
             pass
         self.prev_text()
@@ -395,18 +391,17 @@ class ImcoTkApp(object):
             tkmb.showinfo('', "Hooray! It's a brand new directory.")
             update_image = True
         else:
-            finished=True
+            finished = True
             for dir in self.session.dirs:
                 img_lst = self.session.load_images(dir)
                 for img in img_lst:
                     if img.codes['Skipped'] is not None or not img.is_coded:
-                        finished=False
-                        tkmb.showinfo("Almost Done!","Remember to code skipped images")
+                        finished = False
+                        tkmb.showinfo("Almost done!", "Remember to code skipped images.")
                         break
                 break
             if finished:
-                tkmb.showinfo('R U SRS???',
-                        "You reached the end! You're a coding god!")
+                tkmb.showinfo("R U SRS???", "You reached the end! You're a coding god!")
         if update_image:
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
@@ -450,6 +445,7 @@ class ImcoTkApp(object):
                 self.session.config.image_max_x,
                 self.session.config.image_max_y)
         self.draw_image()
+        self.prev_text()
         self.filemenu.entryconfig('Save', state=Tk.NORMAL)
         self.filemenu.entryconfig('Export codes to CSV...', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
@@ -466,6 +462,8 @@ class ImcoTkApp(object):
             y = self.session.config.image_max_y / 2 - 1
             self.img_canvas.create_image(x, y, image=self.photo_img)
             self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
+            for code_label in self.code_labels:
+                code_label.set_from_image(self.session.img)
             self.prev_selected_image=self.selected_image
             # TO DO: need to recognize match between files with same path,
             # then update code values accordingly

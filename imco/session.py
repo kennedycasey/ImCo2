@@ -3,7 +3,6 @@ import datetime
 import glob
 import os
 import random
-import re
 
 from imco.config import ImcoConfig
 from imco.db import ImcoDb
@@ -53,17 +52,15 @@ class ImcoSession(object):
         return glob.glob(self.path(*components))
 
     def load_images(self, imco_dir):
-        paths = glob.glob(os.path.join(imco_dir.path, self.config.image_glob))
+        paths = sorted(glob.glob(os.path.join(imco_dir.path, self.config.image_glob)))
         img_rows = self.db.load_image_rows(imco_dir.name)
         images = []
         for path in paths:
             img = ImcoImage(path, self.config.codes)
-            img.number = re.findall('\/([0-9]+)(?=[^\/]*$)', img.path)
             row = img_rows.get(img.name)
             if row is not None:
                 img.fill_from_db_row(row, self.config.codes)
             images.append(img)
-            images.sort(key= lambda x: x.number)
         return images
 
     def set_dir(self, index):
@@ -169,7 +166,6 @@ class ImcoImage(object):
         self.codes = dict((c.code, None) for c in codes)
         self.comments = ''
         self.object_name = ''
-        self.number = 0
 
     @property
     def timestamp(self):
@@ -182,6 +178,8 @@ class ImcoImage(object):
             db_value = row.get(code.code)
             if db_value is not None:
                 self.codes[code.code] = code.from_db(db_value)
+        self.comments = row['Comments']
+        self.object_name = row['Object']
 
     def code(self, code, value):
         self.codes[code.code] = value
