@@ -477,7 +477,7 @@ class ImcoTkApp(object):
         if self.selected_image is not None:
             self.photo_img = Tk.PhotoImage(file=self.selected_image)
             x = self.session.config.image_max_x / 2 - 1
-            y = self.session.config.image_max_y / 2 - 1
+            y = self.session.config.image_max_y / 2.42 - 1
             self.img_canvas.create_image(x, y, image=self.photo_img)
             self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
             for code_label in self.code_labels:
@@ -488,7 +488,7 @@ class ImcoTkApp(object):
                 self.img_canvas.delete(self.photo_img)
             self.photo_img = Tk.PhotoImage(file=self.session.img.path)
             x = self.session.config.image_max_x / 2 - 1
-            y = self.session.config.image_max_y / 2 - 1
+            y = self.session.config.image_max_y / 2.42 - 1
             self.img_canvas.create_image(x, y, image=self.photo_img)
             self.path_label.config(text=self.session.img_path)
             for code_label in self.code_labels:
