@@ -289,7 +289,7 @@ class ImcoTkApp(object):
         for index in range(len(img_lst)):
             if img_lst[index].path==self.selected_image:
                 self.session.img_index = index-1
-                self.handle_next_image()
+                self.handle_next_image_conditional()
                 break
             #break
 
