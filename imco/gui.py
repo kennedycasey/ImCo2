@@ -409,6 +409,37 @@ class ImcoTkApp(object):
             self.draw_image()
             self.formatting()
 
+    def handle_next_image_conditional(self, event=None):
+        if self.session is None:
+            return
+        update_image = False
+        if self.session.next_image():
+            update_image = True
+        elif self.session.next_dir():
+            tkmb.showinfo('', "Hooray! It's a brand new directory.")
+            update_image = True
+        else:
+            finished = True
+            for dir in self.session.dirs:
+                img_lst = self.session.load_images(dir)
+                for img in img_lst:
+                    if img.codes['Skipped'] is not None or not img.is_coded:
+                        finished = False
+                        tkmb.showinfo("Almost done!", "Remember to code skipped images.")
+                        break
+                break
+            if finished:
+                tkmb.showinfo("R U SRS???", "You reached the end! You're a coding god!")
+        if update_image:
+            if self.prev_selected_image != None:
+                if self.prev_selected_image == self.selected_image:
+                    self.selected_image = None
+            self.draw_image()
+            self.formatting()
+
+
+
+
     def handle_frontier(self, event=None):
         if self.session is None:
             return
@@ -420,7 +451,7 @@ class ImcoTkApp(object):
         for index in reversed(range(self.session.img_index)):
             if img_lst[index].codes['Skipped'] != None:
                 self.session.img_index = index-1
-                self.handle_next_image()
+                self.handle_next_image_conditional()
                 break
 
     def handle_next_skipped(self):
@@ -428,7 +459,7 @@ class ImcoTkApp(object):
         for index in range(self.session.img_index+1, len(img_lst)):
             if img_lst[index].codes['Skipped'] != None:
                 self.session.img_index = index-1
-                self.handle_next_image()
+                self.handle_next_image_conditional()
                 break
 
     def open_workdir(self, path):
