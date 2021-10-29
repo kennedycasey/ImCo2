@@ -1,6 +1,8 @@
 import tkinter as Tk
-from tkinter import Toplevel
 from tkinter import simpledialog
+from tkinter import ttk
+from tkinter import Toplevel
+from PIL import Image
 import tkinter.messagebox as tkmb
 import tkinter.filedialog
 import tkinter.font
@@ -9,6 +11,7 @@ import os
 import sys
 import re
 import webbrowser
+import glob
 
 from imco.version import VERSION
 from imco.session import ImcoSession
@@ -293,12 +296,25 @@ class ImcoTkApp(object):
                 break
             #break
 
+
+    #Makes list of image paths within 10 of the selected image and adds them to ContextApp 
+    #for creation of context images interface.
     def handle_open_context(self, event=None):
         context_path = tkinter.filedialog.askdirectory(initialdir = os.getcwd(),
             parent=self.root)
         current_image_path = self.session.img.path
         context_image_path = context_path + '/' + re.sub('.*/', '', current_image_path)
-        webbrowser.open(context_path)
+        paths = sorted(glob.glob(os.path.join(context_path, self.session.config.image_glob)))
+        img_lst = []
+        for index, path in enumerate(paths):
+            current_index = paths.index(context_image_path)
+            if index <= current_index + 10 or index >= current_index - 10:
+                img_lst.append(path)
+        ContextApp(img_lst, context_path)
+        
+        
+
+        #webbrowser.open(context_path)
         #load = Image.open(context_image_path)
         #render = Tk.PhotoImage(load)
 
@@ -490,7 +506,7 @@ class ImcoTkApp(object):
         if self.selected_image is not None:
             self.photo_img = Tk.PhotoImage(file=self.selected_image)
             x = self.session.config.image_max_x / 2 - 1
-            y = self.session.config.image_max_y / 2 - 1
+            y = self.session.config.image_max_y / 2 - 1.1
             self.img_canvas.create_image(x, y, image=self.photo_img)
             self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
             for code_label in self.code_labels:
@@ -506,7 +522,7 @@ class ImcoTkApp(object):
                 self.img_canvas.delete(self.photo_img)
             self.photo_img = Tk.PhotoImage(file=self.session.img.path)
             x = self.session.config.image_max_x / 2 - 1
-            y = self.session.config.image_max_y / 2 - 1
+            y = self.session.config.image_max_y / 2.42 - 1
             self.img_canvas.create_image(x, y, image=self.photo_img)
             self.path_label.config(text=self.session.img_path)
             for code_label in self.code_labels:
@@ -611,6 +627,52 @@ class CodeLabel(object):
             self.set_value(new_value)
         else:
             self.draw_label()
+
+
+#Attempt at interface for context images. Still need to figure out proper way to load
+#images into it, but all the commands needed should be here. 
+class ContextApp(object):
+
+    def __init__(self, img_lst, context_path):
+        self.root = Tk.Tk()
+        self.context_path = context_path
+        self.img = None
+        self.img_lst = img_lst
+        self.img_path = img_lst[0]
+        self.img_index = 0
+        self.open_image()
+        self.build_menu()
+
+    def build_menu(self):
+        self.filemenu = Tk.Menu(self.root)
+        self.filemenu.add_command(label='Next',
+                command=self.next_context_image(),
+                accelerator='Right',
+                state=Tk.DISABLED)
+        self.filemenu.add_command(label='Previous',
+                command=self.prev_context_image(),
+                accelerator='Left',
+                state=Tk.DISABLED)
+
+    def open_image(self):
+        self.img = Tk.PhotoImage(self.img_path)
+        ttk.Label(self.root, image=self.img).pack()
+
+    def next_context_image(self):
+        if self.img_index < len(self.img_lst) - 1:
+            self.img_index += 1
+            self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
+            ttk.Label(self.root, image=self.img).pack()
+    
+    def prev_context_image(self):
+        if self.img_index > 0:
+            self.img_index += 1
+            self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
+            ttk.Label(self.root, image=self.img).pack()
+
+    def delete_window(self):
+        self.root.destroy()
+
 
 if sys.platform == 'darwin':
     META_BINDING = 'Command'
