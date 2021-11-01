@@ -54,7 +54,7 @@ class ImcoTkApp(object):
         self.filemenu = Tk.Menu(self.root)
         self.menubar.add_cascade(label='File', menu=self.filemenu)
         self.filemenu.add_command(
-                label='Open',
+                label='Open workdir',
                 command=self.handle_open,
                 accelerator=meta_accelerator('O'))
         self.filemenu.add_command(
@@ -73,6 +73,7 @@ class ImcoTkApp(object):
         self.filemenu.add_command(
                 label='Export codes to CSV...',
                 command=self.handle_export,
+                accelerator=meta_accelerator('E'),
                 state=Tk.DISABLED)
         self.imagemenu = Tk.Menu(self.root)
         self.menubar.add_cascade(label='Image', menu=self.imagemenu)
@@ -94,14 +95,26 @@ class ImcoTkApp(object):
         self.imagemenu.add_command(
             label='Next Skipped',
             command=self.handle_next_skipped,
+            accelerator=meta_accelerator('Shift-Right'),
             state=Tk.DISABLED)
         self.imagemenu.add_command(
             label='Previous Skipped',
             command=self.handle_prev_skipped,
+            accelerator=meta_accelerator('Shift-Left'),
             state=Tk.DISABLED)
+        self.entrymenu = Tk.Menu(self.root)
+        self.menubar.add_cascade(label='Text Entry', menu=self.entrymenu)
+        self.entrymenu.add_command(
+                label='Add object name',
+                command=self.handle_object_entry,
+                accelerator=meta_accelerator('N'))
+        self.entrymenu.add_command(
+                label='Add comment',
+                command=self.handle_comment_entry,
+                accelerator=meta_accelerator('T'))
         self.root.config(menu=self.menubar)
 
-    def build_object_entry(self):
+    def handle_object_entry(self, event=None):
         self.object_entry = simpledialog.askstring(
                 title="Add object name(s)",
                 prompt="Reminder: Make sure to add commas between names if there are 2+ objects")
@@ -115,9 +128,16 @@ class ImcoTkApp(object):
         if self.object_entry != '':
             self.session.modified_images[self.session.img.path] = self.session.img
             self.session.save()
-        self.object_entry_button.pack_forget()
+        self.object_undo_button.pack()
+        #self.object_entry_button.pack_forget()
 
-    def build_comment_entry(self):
+    def remove_object_entry(self):
+        self.session.img.object_name = None
+
+    def remove_comment_entry(self):
+        self.session.img.comments = None
+
+    def handle_comment_entry(self, event=None):
         self.comment_entry = simpledialog.askstring(
                 title="Add comments",
                 prompt="")
@@ -131,7 +151,8 @@ class ImcoTkApp(object):
         if self.comment_entry != '':
             self.session.modified_images[self.session.img.path] = self.session.img
             self.session.save()
-        self.comment_entry_button.pack_forget()
+        self.comment_undo_button.pack()
+        #self.comment_entry_button.pack_forget()
 
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
@@ -182,45 +203,26 @@ class ImcoTkApp(object):
                 bg=DEFAULT_BG,
                 text='TEXT ENTRIES')
         self.entries_section_label.pack(fill=Tk.X, pady=(10, 0))
-        self.object_entry_button = Tk.Button(
-                self.info_frame,
-                text = "Add object name(s)",
-                bg = DEFAULT_BG,
-                highlightbackground = DEFAULT_BG,
-                #command = self.build_object_entry
-                command = lambda:[self.build_object_entry(),
-                    self.object_undo_button.pack(),
-                    self.object_entry_button.pack_forget()]
-                )
-        self.object_entry_button.pack()
-        self.comment_entry_button = Tk.Button(
-                self.info_frame,
-                text = "Add comments",
-                bg = DEFAULT_BG,
-                highlightbackground = DEFAULT_BG,
-                command = lambda:[self.build_comment_entry(),
-                    self.comment_undo_button.pack(),
-                    self.comment_entry_button.pack_forget()]
-                )
-        self.comment_entry_button.pack()
         self.comment_exists=False
         self.object_undo_button = Tk.Button(
             self.info_frame,
             text = 'Undo object entry',
             bg = DEFAULT_BG,
             highlightbackground = DEFAULT_BG,
-            command = lambda:[self.object_entry_button.pack(),
-                self.object_undo_button.pack_forget(),
-                self.object_name.destroy()]
+            command = lambda:[self.object_undo_button.pack_forget(),
+                self.object_name.destroy(),
+                self.remove_object_entry(),
+                self.session.save()]
         )
         self.comment_undo_button = Tk.Button(
             self.info_frame,
             text = 'Undo comment entry',
             bg = DEFAULT_BG,
             highlightbackground = DEFAULT_BG,
-            command = lambda:[self.comment_entry_button.pack(),
-                self.comment_undo_button.pack_forget(),
-                self.comments.destroy()]
+            command = lambda:[self.comment_undo_button.pack_forget(),
+                self.comments.destroy(),
+                self.remove_comment_entry(),
+                self.session.save()]
         )
         self.img_canvas = Tk.Canvas(
                 self.root,
@@ -250,9 +252,6 @@ class ImcoTkApp(object):
                 listen=self.root, handler=self.handle_code)
         self.code_labels.append(cl)
 
-    #def entry_label(self):
-        #el = Label()
-
     def install_protocols(self):
         self.root.protocol('WM_DELETE_WINDOW', self.handle_delete_window)
         # On OS X (at least), quitting via Cmd+Q doesn't trigger
@@ -263,12 +262,15 @@ class ImcoTkApp(object):
         self.root.bind('<Left>', self.handle_prev_image)
         self.root.bind('<Right>', self.handle_next_image)
         self.root.bind('<Return>', self.handle_next_image)
-        self.root.bind('<Shift-Left>', self.handle_prev_skipped)
-        self.root.bind('<Shift-Right>', self.handle_next_skipped)
+        self.root.bind(meta_binding('Shift-Left'), self.handle_prev_skipped)
+        self.root.bind(meta_binding('Shift-Right'), self.handle_next_skipped)
         self.root.bind(meta_binding('s'), self.handle_save)
+        self.root.bind(meta_binding('e'), self.handle_export)
         self.root.bind(meta_binding('o'), self.handle_open)
         self.root.bind(meta_binding('i'), self.handle_open_image)
         self.root.bind(meta_binding('c'), self.handle_open_context)
+        self.root.bind(meta_binding('n'), self.handle_object_entry)
+        self.root.bind(meta_binding('t'), self.handle_comment_entry)
         self.root.bind(meta_binding('Right'), self.handle_frontier)
 
     def handle_open(self, event=None):
@@ -287,14 +289,12 @@ class ImcoTkApp(object):
                     filetypes=[("image", "*.gif")],
                     parent=self.root)
         self.session.save()
-        #for dir in self.session.dirs:
         img_lst = self.session.load_images(self.session.dir)
         for index in range(len(img_lst)):
             if img_lst[index].path==self.selected_image:
                 self.session.img_index = index-1
                 self.handle_next_image_conditional()
                 break
-            #break
 
 
     #Makes list of image paths within 10 of the selected image and adds them to ContextApp 
@@ -318,7 +318,7 @@ class ImcoTkApp(object):
         #load = Image.open(context_image_path)
         #render = Tk.PhotoImage(load)
 
-    def handle_save(self):
+    def handle_save(self, event=None):
         if self.session is not None:
             self.session.save()
 
@@ -365,7 +365,6 @@ class ImcoTkApp(object):
                 bg = '#f6f6f6')
             self.object_name.pack(fill=Tk.X)
             self.object_undo_button.pack()
-            self.object_entry_button.pack_forget()
 
         if self.session.img.comments != '':
             self.comments = Tk.Label(
@@ -375,13 +374,10 @@ class ImcoTkApp(object):
                 bg = '#f6f6f6')
             self.comments.pack(fill=Tk.X)
             self.comment_undo_button.pack()
-            self.comment_entry_button.pack_forget()
 
     def formatting(self):
         if not self.session.img_coded():
             self.session.update_frontier()
-        self.object_entry_button.pack()
-        self.comment_entry_button.pack()
         self.object_undo_button.pack_forget()
         self.comment_undo_button.pack_forget()
         try:
@@ -453,16 +449,13 @@ class ImcoTkApp(object):
             self.draw_image()
             self.formatting()
 
-
-
-
     def handle_frontier(self, event=None):
         if self.session is None:
             return
         self.session.jump_to_frontier_image()
         self.draw_image()
 
-    def handle_prev_skipped(self):
+    def handle_prev_skipped(self, event=None):
         img_lst = self.session.load_images(self.session.dir)
         for index in reversed(range(self.session.img_index)):
             if img_lst[index].codes['Skipped'] != None:
@@ -470,7 +463,7 @@ class ImcoTkApp(object):
                 self.handle_next_image_conditional()
                 break
 
-    def handle_next_skipped(self):
+    def handle_next_skipped(self, event=None):
         img_lst = self.session.load_images(self.session.dir)
         for index in range(self.session.img_index+1, len(img_lst)):
             if img_lst[index].codes['Skipped'] != None:
@@ -502,21 +495,15 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Previous Skipped', state=Tk.NORMAL)
 
     def draw_image(self):
-        #try:
         if self.selected_image is not None:
             self.photo_img = Tk.PhotoImage(file=self.selected_image)
             x = self.session.config.image_max_x / 2 - 1
-            y = self.session.config.image_max_y / 2 - 1.1
+            y = self.session.config.image_max_y / 2.42 - 1
             self.img_canvas.create_image(x, y, image=self.photo_img)
             self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
             for code_label in self.code_labels:
                 code_label.set_from_image(self.session.img)
             self.prev_selected_image=self.selected_image
-            # TO DO: need to recognize match between files with same path,
-            # then update code values accordingly
-            #for code_label in self.code_labels:
-                #code_label.set_from_image(re.sub('^(.*images/)', '', self.selected_image))
-        #except AttributeError:
         else:
             if self.photo_img is not None:
                 self.img_canvas.delete(self.photo_img)

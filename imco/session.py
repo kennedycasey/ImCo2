@@ -139,7 +139,6 @@ class ImcoSession(object):
             row = [coder] + list(row)
             writer.writerow(row)
 
-
 class ImcoDir(object):
 
     def __init__(self, path, session):
