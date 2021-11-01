@@ -70,6 +70,7 @@ class ImcoTkApp(object):
         self.filemenu.add_command(
                 label='Export codes to CSV...',
                 command=self.handle_export,
+                accelerator=meta_accelerator('E'),
                 state=Tk.DISABLED)
         self.imagemenu = Tk.Menu(self.root)
         self.menubar.add_cascade(label='Image', menu=self.imagemenu)
@@ -91,17 +92,20 @@ class ImcoTkApp(object):
         self.imagemenu.add_command(
             label='Next Skipped',
             command=self.handle_next_skipped,
+            accelerator=meta_accelerator('Shift-Right'),
             state=Tk.DISABLED)
         self.imagemenu.add_command(
             label='Previous Skipped',
             command=self.handle_prev_skipped,
+            accelerator=meta_accelerator('Shift-Left'),
             state=Tk.DISABLED)
-        self.menubar.add_cascade(label='Text Entry', menu=self.filemenu)
-        self.filemenu.add_command(
+        self.entrymenu = Tk.Menu(self.root)
+        self.menubar.add_cascade(label='Text Entry', menu=self.entrymenu)
+        self.entrymenu.add_command(
                 label='Add object name',
                 command=self.handle_object_entry,
                 accelerator=meta_accelerator('N'))
-        self.filemenu.add_command(
+        self.entrymenu.add_command(
                 label='Add comment',
                 command=self.handle_comment_entry,
                 accelerator=meta_accelerator('T'))
@@ -255,9 +259,10 @@ class ImcoTkApp(object):
         self.root.bind('<Left>', self.handle_prev_image)
         self.root.bind('<Right>', self.handle_next_image)
         self.root.bind('<Return>', self.handle_next_image)
-        self.root.bind('<Shift-Left>', self.handle_prev_skipped)
-        self.root.bind('<Shift-Right>', self.handle_next_skipped)
+        self.root.bind(meta_binding('Shift-Left'), self.handle_prev_skipped)
+        self.root.bind(meta_binding('Shift-Right'), self.handle_next_skipped)
         self.root.bind(meta_binding('s'), self.handle_save)
+        self.root.bind(meta_binding('e'), self.handle_export)
         self.root.bind(meta_binding('o'), self.handle_open)
         self.root.bind(meta_binding('i'), self.handle_open_image)
         self.root.bind(meta_binding('c'), self.handle_open_context)
@@ -434,7 +439,7 @@ class ImcoTkApp(object):
         self.session.jump_to_frontier_image()
         self.draw_image()
 
-    def handle_prev_skipped(self):
+    def handle_prev_skipped(self, event=None):
         img_lst = self.session.load_images(self.session.dir)
         for index in reversed(range(self.session.img_index)):
             if img_lst[index].codes['Skipped'] != None:
@@ -442,7 +447,7 @@ class ImcoTkApp(object):
                 self.handle_next_image_conditional()
                 break
 
-    def handle_next_skipped(self):
+    def handle_next_skipped(self, event=None):
         img_lst = self.session.load_images(self.session.dir)
         for index in range(self.session.img_index+1, len(img_lst)):
             if img_lst[index].codes['Skipped'] != None:
