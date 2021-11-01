@@ -8,7 +8,7 @@ import atexit
 import os
 import sys
 import re
-import webbrowser
+import glob
 
 from imco.version import VERSION
 from imco.session import ImcoSession
@@ -296,11 +296,15 @@ class ImcoTkApp(object):
     def handle_open_context(self, event=None):
         context_path = tkinter.filedialog.askdirectory(initialdir = os.getcwd(),
             parent=self.root)
-        current_image_path = self.session.img.path
-        context_image_path = context_path + '/' + re.sub('.*/', '', current_image_path)
-        webbrowser.open(context_path)
-        #load = Image.open(context_image_path)
-        #render = Tk.PhotoImage(load)
+        self.current_image_path = self.session.img.path
+        self.context_image_path = context_path + '/' + re.sub('.*/', '', self.current_image_path)
+        paths = sorted(glob.glob(os.path.join(context_path, self.session.config.image_glob)))
+        img_lst = []
+        for index, path in enumerate(paths):
+            current_index = paths.index(self.context_image_path)
+            if index <= current_index + 10 or index >= current_index - 10:
+                img_lst.append(path)
+        ContextApp(img_lst, context_path)
 
     def handle_save(self, event=None):
         if self.session is not None:
@@ -598,6 +602,63 @@ class CodeLabel(object):
             self.set_value(new_value)
         else:
             self.draw_label()
+
+class ContextApp(object):
+
+    def __init__(self, img_lst, context_path):
+        self.root = Tk.Toplevel()
+        self.context_path = context_path
+        self.img = None
+        self.img_lst = img_lst
+        self.img_path = img_lst[0]
+        self.img_index = 0
+        self.build_menu()
+        self.build_popup_window()
+        self.open_image()
+
+    def build_menu(self):
+        self.filemenu = Tk.Menu(self.root)
+        self.filemenu.add_command(label='Next',
+                command=self.next_context_image(),
+                accelerator='Right',
+                state=Tk.DISABLED)
+        self.filemenu.add_command(label='Previous',
+                command=self.prev_context_image(),
+                accelerator='Left',
+                state=Tk.DISABLED)
+
+    def build_popup_window(self):
+        self.root.title("Context Images")
+        self.root.config(bg=DEFAULT_BG)
+        self.context_img_canvas = Tk.Canvas(
+                self.root,
+                bg=CANVAS_BG,
+                highlightthickness=0)
+        self.context_img_canvas.config(width=DEFAULT_CANVAS_SIZE, height=DEFAULT_CANVAS_SIZE)
+        #self.root.grid_columnconfigure(0, minsize=INFO_FRAME_WIDTH)
+        #self.root.update()
+        #self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
+
+    def open_image(self):
+        self.img = Tk.PhotoImage(file=self.img_path)
+        self.context_img_canvas.create_image(500, 425, image=self.img)
+        #self.path_label.config(text=re.sub('^(.*images/)', '', self.img_path))
+        Tk.Label(self.root, image=self.img).pack()
+
+    def next_context_image(self):
+        if self.img_index < len(self.img_lst) - 1:
+            self.img_index += 1
+            self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
+            Tk.Label(self.root, image=self.img).pack()
+
+    def prev_context_image(self):
+        if self.img_index > 0:
+            self.img_index += 1
+            self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
+            Tk.Label(self.root, image=self.img).pack()
+
+    def delete_window(self):
+        self.root.destroy()
 
 if sys.platform == 'darwin':
     META_BINDING = 'Command'
