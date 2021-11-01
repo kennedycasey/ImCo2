@@ -612,50 +612,56 @@ class ContextApp(object):
         self.img_lst = img_lst
         self.img_path = img_lst[0]
         self.img_index = 0
-        self.build_menu()
+        #self.build_menu()
         self.build_popup_window()
         self.open_image()
-
-    def build_menu(self):
-        self.filemenu = Tk.Menu(self.root)
-        self.filemenu.add_command(label='Next',
-                command=self.next_context_image(),
-                accelerator='Right',
-                state=Tk.DISABLED)
-        self.filemenu.add_command(label='Previous',
-                command=self.prev_context_image(),
-                accelerator='Left',
-                state=Tk.DISABLED)
 
     def build_popup_window(self):
         self.root.title("Context Images")
         self.root.config(bg=DEFAULT_BG)
-        self.context_img_canvas = Tk.Canvas(
-                self.root,
-                bg=CANVAS_BG,
-                highlightthickness=0)
+        self.context_img_canvas = Tk.Canvas(self.root, bg=CANVAS_BG, highlightthickness=0)
         self.context_img_canvas.config(width=DEFAULT_CANVAS_SIZE, height=DEFAULT_CANVAS_SIZE)
+        self.context_img_canvas.pack()
+        self.next_button = Tk.Button(
+            self.root,
+            text = 'Next',
+            bg = DEFAULT_BG,
+            highlightbackground = DEFAULT_BG,
+            command = self.next_context_image())
+        self.next_button.pack()
+        self.prev_button = Tk.Button(
+            self.root,
+            text = 'Previous',
+            bg = DEFAULT_BG,
+            highlightbackground = DEFAULT_BG,
+            command = self.prev_context_image())
+        self.prev_button.pack()
         #self.root.grid_columnconfigure(0, minsize=INFO_FRAME_WIDTH)
         #self.root.update()
         #self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
 
     def open_image(self):
         self.img = Tk.PhotoImage(file=self.img_path)
-        self.context_img_canvas.create_image(500, 425, image=self.img)
+        self.context_img_canvas.img = self.img
+        self.context_img_canvas.create_image(500, 425, image=self.context_img_canvas.img)
         #self.path_label.config(text=re.sub('^(.*images/)', '', self.img_path))
-        Tk.Label(self.root, image=self.img).pack()
+        #Tk.Label(self.root, image=self.img).pack()
 
     def next_context_image(self):
         if self.img_index < len(self.img_lst) - 1:
             self.img_index += 1
             self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
-            Tk.Label(self.root, image=self.img).pack()
+            self.context_img_canvas.img = self.img
+            self.context_img_canvas.create_image(500, 425, image=self.context_img_canvas.img)
+            #Tk.Label(self.root, image=self.img).pack()
 
     def prev_context_image(self):
         if self.img_index > 0:
             self.img_index += 1
             self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
-            Tk.Label(self.root, image=self.img).pack()
+            self.context_img_canvas.img = self.img
+            self.context_img_canvas.create_image(500, 425, image=self.context_img_canvas.img)
+            #Tk.Label(self.root, image=self.img).pack()
 
     def delete_window(self):
         self.root.destroy()
