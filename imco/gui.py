@@ -117,18 +117,17 @@ class ImcoTkApp(object):
         self.object_entry = simpledialog.askstring(
                 title="Add object name(s)",
                 prompt="Reminder: Make sure to add commas between names if there are 2+ objects")
-        self.object_name = Tk.Label(
+        if self.object_entry is not None:
+            self.object_name = Tk.Label(
                 self.info_frame,
                 text = "Your object name(s): " + self.object_entry,
                 fg = '#05976c',
                 bg = '#f6f6f6')
-        self.object_name.pack(fill=Tk.X)
-        self.session.img.object_name = self.object_entry
-        if self.object_entry != '':
+            self.object_name.pack(fill=Tk.X)
+            self.session.img.object_name = self.object_entry
             self.session.modified_images[self.session.img.path] = self.session.img
             self.session.save()
-        self.object_undo_button.pack()
-        #self.object_entry_button.pack_forget()
+            self.object_undo_button.pack()
 
     def remove_object_entry(self):
         self.session.img.object_name = None
@@ -140,18 +139,16 @@ class ImcoTkApp(object):
         self.comment_entry = simpledialog.askstring(
                 title="Add comments",
                 prompt="")
-        self.comments = Tk.Label(
+        if self.comment_entry is not None:
+            self.comments = Tk.Label(
                 self.info_frame,
                 text = "Your comments: " + self.comment_entry,
                 fg = '#05976c',
                 bg = '#f6f6f6')
-        self.comments.pack(fill=Tk.X)
-        self.session.img.comments = self.comment_entry
-        if self.comment_entry != '':
+            self.comments.pack(fill=Tk.X)
             self.session.modified_images[self.session.img.path] = self.session.img
             self.session.save()
-        self.comment_undo_button.pack()
-        #self.comment_entry_button.pack_forget()
+            self.comment_undo_button.pack()
 
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
@@ -296,7 +293,7 @@ class ImcoTkApp(object):
                 break
 
 
-    #Makes list of image paths within 10 of the selected image and adds them to ContextApp 
+    #Makes list of image paths within 10 of the selected image and adds them to ContextApp
     #for creation of context images interface.
     def handle_open_context(self, event=None):
         context_path = tkinter.filedialog.askdirectory(initialdir = os.getcwd(),
