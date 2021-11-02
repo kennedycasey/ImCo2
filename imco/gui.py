@@ -106,11 +106,11 @@ class ImcoTkApp(object):
         self.entrymenu.add_command(
                 label='Add object name',
                 command=self.handle_object_entry,
-                accelerator=meta_accelerator('N'))
+                accelerator=meta_accelerator('n'))
         self.entrymenu.add_command(
                 label='Add comment',
                 command=self.handle_comment_entry,
-                accelerator=meta_accelerator('T'))
+                accelerator=meta_accelerator('t'))
         self.root.config(menu=self.menubar)
 
     def handle_object_entry(self, event=None):
@@ -340,10 +340,16 @@ class ImcoTkApp(object):
         if self.session is None:
             return
         if self.session.prev_image():
+            if self.prev_selected_image != None:
+                if self.prev_selected_image == self.selected_image:
+                    self.selected_image = None
             self.draw_image()
             self.formatting()
         elif self.session.prev_dir():
             tkmb.showinfo('', 'Going back to previous directory.')
+            if self.prev_selected_image != None:
+                if self.prev_selected_image == self.selected_image:
+                    self.selected_image = None
             self.draw_image()
             self.formatting()
         else:
@@ -403,6 +409,8 @@ class ImcoTkApp(object):
                     if img.codes['Skipped'] is not None or not img.is_coded:
                         finished = False
                         tkmb.showinfo("Almost done!", "Remember to code skipped images.")
+                        self.session.img_index = img_lst.index(img) - 1
+                        self.handle_next_image()
                         break
                 break
             if finished:
