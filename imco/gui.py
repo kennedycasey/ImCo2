@@ -59,11 +59,13 @@ class ImcoTkApp(object):
         self.filemenu.add_command(
                 label='Open specific image',
                 command=self.handle_open_image,
-                accelerator=meta_accelerator('I'))
+                accelerator=meta_accelerator('I'),
+                state=Tk.DISABLED)
         self.filemenu.add_command(
                 label='View context',
                 command=self.handle_open_context,
-                accelerator=meta_accelerator('C'))
+                accelerator=meta_accelerator('C'),
+                state=Tk.DISABLED)
         self.filemenu.add_command(
                 label='Save',
                 command=self.handle_save,
@@ -104,13 +106,15 @@ class ImcoTkApp(object):
         self.entrymenu = Tk.Menu(self.root)
         self.menubar.add_cascade(label='Text Entry', menu=self.entrymenu)
         self.entrymenu.add_command(
-                label='Add object name',
-                command=self.handle_object_entry,
-                accelerator=meta_accelerator('n'))
+            label='Add object name',
+            command=self.handle_object_entry,
+            accelerator=meta_accelerator('n'),
+            state=Tk.DISABLED)
         self.entrymenu.add_command(
-                label='Add comment',
-                command=self.handle_comment_entry,
-                accelerator=meta_accelerator('t'))
+            label='Add comment',
+            command=self.handle_comment_entry,
+            accelerator=meta_accelerator('t'),
+            state=Tk.DISABLED)
         self.root.config(menu=self.menubar)
 
     def handle_object_entry(self, event=None):
