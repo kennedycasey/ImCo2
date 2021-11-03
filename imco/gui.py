@@ -115,6 +115,16 @@ class ImcoTkApp(object):
             command=self.handle_comment_entry,
             accelerator=meta_accelerator('t'),
             state=Tk.DISABLED)
+        self.progressmenu = Tk.Menu(self.root)
+        self.menubar.add_cascade(label='Check Progress', menu=self.progressmenu)
+        self.progressmenu.add_command(
+                label='Check remaining images',
+                command=self.handle_uncoded_count,
+                state=Tk.DISABLED)
+        self.progressmenu.add_command(
+                label='Check coded images',
+                command=self.handle_coded_list,
+                state=Tk.DISABLED)
         self.root.config(menu=self.menubar)
 
     def handle_object_entry(self, event=None):
@@ -153,6 +163,12 @@ class ImcoTkApp(object):
             self.session.modified_images[self.session.img.path] = self.session.img
             self.session.save()
             self.comment_undo_button.pack()
+
+    def handle_uncoded_count(self, event=None):
+        pass
+
+    def handle_coded_list(self, event=None):
+        pass
 
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
@@ -490,11 +506,17 @@ class ImcoTkApp(object):
         self.prev_text()
         self.filemenu.entryconfig('Save', state=Tk.NORMAL)
         self.filemenu.entryconfig('Export codes to CSV...', state=Tk.NORMAL)
+        self.filemenu.entryconfig('Open specific image', state=Tk.NORMAL)
+        self.filemenu.entryconfig('View context', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next Skipped', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Previous Skipped', state=Tk.NORMAL)
+        self.entrymenu.entryconfig('Add object name', state=Tk.NORMAL)
+        self.entrymenu.entryconfig('Add comment', state=Tk.NORMAL)
+        self.progressmenu.entryconfig('Check remaining images', state=Tk.NORMAL)
+        self.progressmenu.entryconfig('Check coded images', state=Tk.NORMAL)
 
     def draw_image(self):
         if self.selected_image is not None:
@@ -505,7 +527,7 @@ class ImcoTkApp(object):
             self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
             for code_label in self.code_labels:
                 code_label.set_from_image(self.session.img)
-            self.prev_selected_image=self.selected_image
+            self.prev_selected_image = self.selected_image
         else:
             if self.photo_img is not None:
                 self.img_canvas.delete(self.photo_img)
