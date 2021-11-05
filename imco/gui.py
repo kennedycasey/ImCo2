@@ -709,7 +709,7 @@ class ContextApp(object):
         self.target_image.pack()
 
     def next_context_image(self):
-        if self.img_index < len(self.img_lst) - 1:
+        if self.img_index < len(self.img_lst) - 1 and self.img_index != self.target_index - 1:
             self.img_index += 1
             self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
             self.context_img_canvas.img = self.img
@@ -717,12 +717,14 @@ class ContextApp(object):
             self.context_img_canvas.itemconfig(self.new, image=self.context_img_canvas.img)
             self.context_path_label.config(text=re.sub('^(.*context/)', '', self.img_lst[self.img_index]))
             self.target_image.pack_forget()
+        elif self.img_index == self.target_index - 1:
+            self.open_image()
         else:
             tkmb.showinfo("", "No more context images in this direction!\n\nReturning to the target image.")
             self.open_image()
 
     def prev_context_image(self):
-        if self.img_index > 0:
+        if self.img_index > 0 and self.img_index != self.target_index + 1:
             self.img_index -= 1
             self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
             self.context_img_canvas.img = self.img
@@ -730,6 +732,8 @@ class ContextApp(object):
             self.context_img_canvas.itemconfig(self.new, image=self.context_img_canvas.img)
             self.context_path_label.config(text=re.sub('^(.*context/)', '', self.img_lst[self.img_index]))
             self.target_image.pack_forget()
+        elif self.img_index == self.target_index + 1:
+            self.open_image()
         else:
             tkmb.showinfo("", "No more context images in this direction!\n\nReturning to the target image.")
             self.open_image()
