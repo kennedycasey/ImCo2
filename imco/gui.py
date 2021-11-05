@@ -305,17 +305,19 @@ class ImcoTkApp(object):
     #Makes list of image paths within 10 of the selected image and adds them to ContextApp
     #for creation of context images interface.
     def handle_open_context(self, event=None):
-        context_path = tkinter.filedialog.askdirectory(initialdir = os.getcwd(),
-            parent=self.root)
-        self.current_image_path = self.session.img.path
-        self.context_image_path = context_path + '/' + re.sub('.*/', '', self.current_image_path)
+        current_image_path = self.session.img.path
+        self.current_dir_path = re.sub('([^\/]+$)', '', current_image_path)
+        context_path = re.sub('images', 'context', self.current_dir_path)
+        context_image_path = context_path + re.sub('.*/', '', current_image_path)
         paths = sorted(glob.glob(os.path.join(context_path, self.session.config.image_glob)))
         img_lst = []
         for index, path in enumerate(paths):
-            current_index = paths.index(self.context_image_path)
+            current_index = paths.index(context_image_path)
             if index <= current_index + 10 and index >= current_index - 10:
                 img_lst.append(path)
-        ContextApp(img_lst, context_path)
+        max_x = self.session.config.image_max_x
+        max_y = self.session.config.image_max_y
+        ContextApp(img_lst, context_path, context_image_path, max_x, max_y)
 
     def handle_save(self, event=None):
         if self.session is not None:
@@ -630,57 +632,113 @@ class CodeLabel(object):
 
 class ContextApp(object):
 
-    def __init__(self, img_lst, context_path):
+    def __init__(self, img_lst, context_path, context_image_path, max_x, max_y):
         self.root = Tk.Toplevel()
         self.context_path = context_path
+        self.img_path = context_image_path
         self.img = None
         self.img_lst = img_lst
-        self.img_path = img_lst[0]
-        self.img_index = 0
+        for index in enumerate(self.img_lst):
+            current_index = self.img_lst.index(self.img_path)
+            break
+        self.img_index = current_index
+        self.target_index = current_index
+        self.max_x = max_x / 2-1
+        self.max_y = max_y / 2.42-1
         self.build_popup_window()
         self.open_image()
 
     def build_popup_window(self):
         self.root.title("Context Images")
         self.root.config(bg=DEFAULT_BG)
-        self.context_img_canvas = Tk.Canvas(self.root, bg=CANVAS_BG, highlightthickness=0)
-        self.context_img_canvas.config(width=DEFAULT_CANVAS_SIZE, height=DEFAULT_CANVAS_SIZE)
-        self.context_img_canvas.pack()
+        self.build_fonts()
+        self.info_frame = Tk.Frame(self.root, bg=DEFAULT_BG)
+        self.info_frame.grid(column=0, row=0, sticky=Tk.N+Tk.W, padx=10)
+        self.path_section_label = Tk.Label(
+                self.info_frame,
+                anchor=Tk.W,
+                justify=Tk.LEFT,
+                font=self.section_font,
+                fg=SECTION_FG,
+                bg=DEFAULT_BG,
+                text='PATH')
+        self.path_section_label.pack(fill=Tk.X, pady=(10, 0))
+        self.context_path_label = Tk.Label(
+            self.info_frame,
+            anchor=Tk.W,
+            justify=Tk.LEFT,
+            text = self.img_path,
+            bg=DEFAULT_BG)
+        self.context_path_label.pack(fill=Tk.X)
         self.next_button = Tk.Button(
-            self.root,
-            text = 'Next',
+            self.info_frame,
+            text = 'Next image',
             bg = DEFAULT_BG,
             highlightbackground = DEFAULT_BG,
             command = self.next_context_image)
         self.next_button.pack()
         self.prev_button = Tk.Button(
-            self.root,
-            text = 'Previous',
+            self.info_frame,
+            text = 'Previous image',
             bg = DEFAULT_BG,
             highlightbackground = DEFAULT_BG,
             command = self.prev_context_image)
         self.prev_button.pack()
+        self.target_image = Tk.Label(
+            self.info_frame,
+            anchor=Tk.W,
+            justify=Tk.LEFT,
+            text = 'You are currently viewing the target image.',
+            fg = '#05976c',
+            bg = DEFAULT_BG)
+        self.context_img_canvas = Tk.Canvas(self.root,
+            bg=CANVAS_BG,
+            highlightthickness=0)
+        self.context_img_canvas.grid(column=1, row=0)
+        self.context_img_canvas.config(width=DEFAULT_CANVAS_SIZE + 200, height=DEFAULT_CANVAS_SIZE)
+        self.root.grid_columnconfigure(0, minsize=INFO_FRAME_WIDTH)
+        self.root.update()
+        self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
 
     def open_image(self):
+        self.img_index = self.target_index
         self.img = Tk.PhotoImage(file=self.img_path)
         self.context_img_canvas.img = self.img
-        self.create = self.context_img_canvas.create_image(500, 425, image=self.context_img_canvas.img)
+        self.create = self.context_img_canvas.create_image(self.max_x, self.max_y, image=self.context_img_canvas.img)
+        self.context_path_label.config(text=re.sub('^(.*context/)', '', self.img_lst[self.img_index]))
+        self.target_image.pack()
 
     def next_context_image(self):
         if self.img_index < len(self.img_lst) - 1:
             self.img_index += 1
             self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
             self.context_img_canvas.img = self.img
-            self.new = self.context_img_canvas.create_image(500, 425, image=self.context_img_canvas.img)
+            self.new = self.context_img_canvas.create_image(self.max_x, self.max_y, image=self.context_img_canvas.img)
             self.context_img_canvas.itemconfig(self.new, image=self.context_img_canvas.img)
+            self.context_path_label.config(text=re.sub('^(.*context/)', '', self.img_lst[self.img_index]))
+            self.target_image.pack_forget()
+        else:
+            tkmb.showinfo("", "No more context images in this direction!\n\nReturning to the target image.")
+            self.open_image()
 
     def prev_context_image(self):
         if self.img_index > 0:
             self.img_index -= 1
             self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
             self.context_img_canvas.img = self.img
-            self.new = self.context_img_canvas.create_image(500, 425, image=self.context_img_canvas.img)
+            self.new = self.context_img_canvas.create_image(self.max_x, self.max_y, image=self.context_img_canvas.img)
             self.context_img_canvas.itemconfig(self.new, image=self.context_img_canvas.img)
+            self.context_path_label.config(text=re.sub('^(.*context/)', '', self.img_lst[self.img_index]))
+            self.target_image.pack_forget()
+        else:
+            tkmb.showinfo("", "No more context images in this direction!\n\nReturning to the target image.")
+            self.open_image()
+
+    def build_fonts(self):
+        label = Tk.Label(self.root, text='sample')
+        self.section_font = tkinter.font.Font(font=label['font'])
+        size = self.section_font['size']
+        self.section_font.config(size=size-2)
 
     def delete_window(self):
         self.root.destroy()
