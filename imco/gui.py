@@ -74,6 +74,11 @@ class ImcoTkApp(object):
                 command=self.handle_export,
                 accelerator=meta_accelerator('E'),
                 state=Tk.DISABLED)
+        self.filemenu.add_command(
+                label='Check progress',
+                command=self.handle_check_progress,
+                accelerator=meta_accelerator('P'),
+                state=Tk.DISABLED)
         self.imagemenu = Tk.Menu(self.root)
         self.menubar.add_cascade(label='Image', menu=self.imagemenu)
         self.imagemenu.add_command(
@@ -106,23 +111,13 @@ class ImcoTkApp(object):
         self.entrymenu.add_command(
             label='Add object name',
             command=self.handle_object_entry,
-            accelerator=meta_accelerator('n'),
+            accelerator=meta_accelerator('N'),
             state=Tk.DISABLED)
         self.entrymenu.add_command(
             label='Add comment',
             command=self.handle_comment_entry,
-            accelerator=meta_accelerator('t'),
+            accelerator=meta_accelerator('T'),
             state=Tk.DISABLED)
-        self.progressmenu = Tk.Menu(self.root)
-        self.menubar.add_cascade(label='Check Progress', menu=self.progressmenu)
-        self.progressmenu.add_command(
-                label='Check remaining images',
-                command=self.handle_uncoded_count,
-                state=Tk.DISABLED)
-        self.progressmenu.add_command(
-                label='Check coded images',
-                command=self.handle_coded_list,
-                state=Tk.DISABLED)
         self.root.config(menu=self.menubar)
 
     def handle_object_entry(self, event=None):
@@ -161,11 +156,14 @@ class ImcoTkApp(object):
             self.session.img.comments = self.comment_entry
             self.session.modified_images[self.session.img.path] = self.session.img
 
-    def handle_uncoded_count(self, event=None):
-        pass
-
-    def handle_coded_list(self, event=None):
-        pass
+    def handle_check_progress(self, event=None):
+        count = 0
+        for dir in self.session.dirs:
+            img_lst = self.session.load_images(dir)
+            for img in img_lst:
+                if not img.is_coded(self.session.config.codes) or img.codes['Skipped'] is not None:
+                    count+=1
+        tkmb.showinfo("", "Nice work! You have " + str(count) + " images left to code in this directory.")
 
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
@@ -274,6 +272,7 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('o'), self.handle_open)
         self.root.bind(meta_binding('i'), self.handle_open_image)
         self.root.bind(meta_binding('c'), self.handle_open_context)
+        self.root.bind(meta_binding('p'), self.handle_check_progress)
         self.root.bind(meta_binding('n'), self.handle_object_entry)
         self.root.bind(meta_binding('t'), self.handle_comment_entry)
         self.root.bind(meta_binding('Right'), self.handle_frontier)
@@ -499,6 +498,7 @@ class ImcoTkApp(object):
         self.filemenu.entryconfig('Export codes to CSV...', state=Tk.NORMAL)
         self.filemenu.entryconfig('Open specific image', state=Tk.NORMAL)
         self.filemenu.entryconfig('View context', state=Tk.NORMAL)
+        self.filemenu.entryconfig('Check progress', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
@@ -506,8 +506,6 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Previous Skipped', state=Tk.NORMAL)
         self.entrymenu.entryconfig('Add object name', state=Tk.NORMAL)
         self.entrymenu.entryconfig('Add comment', state=Tk.NORMAL)
-        self.progressmenu.entryconfig('Check remaining images', state=Tk.NORMAL)
-        self.progressmenu.entryconfig('Check coded images', state=Tk.NORMAL)
 
     def draw_image(self):
         if self.selected_image is not None:
