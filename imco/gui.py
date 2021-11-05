@@ -1,8 +1,6 @@
 import tkinter as Tk
 from tkinter import simpledialog
-from tkinter import ttk
 from tkinter import Toplevel
-from PIL import Image
 import tkinter.messagebox as tkmb
 import tkinter.filedialog
 import tkinter.font
@@ -138,10 +136,9 @@ class ImcoTkApp(object):
                 fg = '#05976c',
                 bg = '#f6f6f6')
             self.object_name.pack(fill=Tk.X)
+            self.object_undo_button.pack()
             self.session.img.object_name = self.object_entry
             self.session.modified_images[self.session.img.path] = self.session.img
-            self.session.save()
-            self.object_undo_button.pack()
 
     def remove_object_entry(self):
         self.session.img.object_name = None
@@ -160,9 +157,9 @@ class ImcoTkApp(object):
                 fg = '#05976c',
                 bg = '#f6f6f6')
             self.comments.pack(fill=Tk.X)
-            self.session.modified_images[self.session.img.path] = self.session.img
-            self.session.save()
             self.comment_undo_button.pack()
+            self.session.img.comments = self.comment_entry
+            self.session.modified_images[self.session.img.path] = self.session.img
 
     def handle_uncoded_count(self, event=None):
         pass
@@ -173,7 +170,6 @@ class ImcoTkApp(object):
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
         self.root.config(bg=DEFAULT_BG)
-        #self.root.tk_setPalette(background=DEFAULT_BG)
         self.build_fonts()
         self.info_frame = Tk.Frame(self.root, bg=DEFAULT_BG)
         self.info_frame.grid(column=0, row=0, sticky=Tk.N+Tk.W, padx=10)
@@ -192,13 +188,6 @@ class ImcoTkApp(object):
                 justify=Tk.LEFT,
                 bg=DEFAULT_BG)
         self.path_label.pack(fill=Tk.X)
-        #self.image_select_button = Tk.Button(
-            #self.info_frame,
-            #text = "Open specific image",
-            #bg = DEFAULT_BG,
-            #highlightbackground = DEFAULT_BG,
-            #command = self.build_image_select)
-        #self.image_select_button.pack()
         self.codes_section_label = Tk.Label(
                 self.info_frame,
                 anchor=Tk.W,
@@ -423,7 +412,7 @@ class ImcoTkApp(object):
             for dir in self.session.dirs:
                 img_lst = self.session.load_images(dir)
                 for img in img_lst:
-                    if img.codes['Skipped'] is not None or not img.is_coded:
+                    if img.codes['Skipped'] is not None or not img.is_coded(self.session.config.codes):
                         finished = False
                         tkmb.showinfo("Almost done!", "Remember to code skipped images.")
                         self.session.img_index = img_lst.index(img) - 1
@@ -453,7 +442,7 @@ class ImcoTkApp(object):
             for dir in self.session.dirs:
                 img_lst = self.session.load_images(dir)
                 for img in img_lst:
-                    if img.codes['Skipped'] is not None or not img.is_coded:
+                    if img.codes['Skipped'] is not None or not img.is_coded(self.session.config.codes):
                         finished = False
                         tkmb.showinfo("Almost done!", "Remember to code skipped images.")
                         break
@@ -648,7 +637,6 @@ class ContextApp(object):
         self.img_lst = img_lst
         self.img_path = img_lst[0]
         self.img_index = 0
-        #self.build_menu()
         self.build_popup_window()
         self.open_image()
 
@@ -672,16 +660,11 @@ class ContextApp(object):
             highlightbackground = DEFAULT_BG,
             command = self.prev_context_image)
         self.prev_button.pack()
-        #self.root.grid_columnconfigure(0, minsize=INFO_FRAME_WIDTH)
-        #self.root.update()
-        #self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
 
     def open_image(self):
         self.img = Tk.PhotoImage(file=self.img_path)
         self.context_img_canvas.img = self.img
         self.create = self.context_img_canvas.create_image(500, 425, image=self.context_img_canvas.img)
-        #self.path_label.config(text=re.sub('^(.*images/)', '', self.img_path))
-        #Tk.Label(self.root, image=self.img).pack()
 
     def next_context_image(self):
         if self.img_index < len(self.img_lst) - 1:
