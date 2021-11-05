@@ -416,6 +416,7 @@ class ImcoTkApp(object):
                     if img.codes['Skipped'] is not None or not img.is_coded(self.session.config.codes):
                         finished = False
                         tkmb.showinfo("Almost done!", "Remember to code skipped images.")
+                        self.session.set_dir(self.session.dirs.index(dir))
                         self.session.img_index = img_lst.index(img) - 1
                         self.handle_next_image()
                         break
@@ -440,12 +441,16 @@ class ImcoTkApp(object):
             update_image = True
         else:
             finished = True
+            self.session.save()
             for dir in self.session.dirs:
                 img_lst = self.session.load_images(dir)
                 for img in img_lst:
                     if img.codes['Skipped'] is not None or not img.is_coded(self.session.config.codes):
                         finished = False
                         tkmb.showinfo("Almost done!", "Remember to code skipped images.")
+                        self.session.set_dir(self.session.dirs.index(dir))
+                        self.session.img_index = img_lst.index(img) - 1
+                        self.handle_next_image()
                         break
                 break
             if finished:
@@ -636,11 +641,9 @@ class ContextApp(object):
         self.img_path = context_image_path
         self.img = None
         self.img_lst = img_lst
-        for index in enumerate(self.img_lst):
-            current_index = self.img_lst.index(self.img_path)
-            break
-        self.img_index = current_index
-        self.target_index = current_index
+        self.current_index = self.img_lst.index(self.img_path)
+        self.img_index = self.current_index
+        self.target_index = self.current_index
         self.max_x = max_x / 2-1
         self.max_y = max_y / 2.42-1
         self.build_popup_window()
@@ -682,6 +685,12 @@ class ContextApp(object):
             highlightbackground = DEFAULT_BG,
             command = self.prev_context_image)
         self.prev_button.pack()
+        self.target_button = Tk.Button(
+            self.info_frame,
+            text = 'Return to target image',
+            bg = DEFAULT_BG,
+            highlightbackground = DEFAULT_BG,
+            command = self.open_image)
         self.target_image = Tk.Label(
             self.info_frame,
             anchor=Tk.W,
@@ -705,6 +714,7 @@ class ContextApp(object):
         self.create = self.context_img_canvas.create_image(self.max_x, self.max_y, image=self.context_img_canvas.img)
         self.context_path_label.config(text=re.sub('^(.*context/)', '', self.img_lst[self.img_index]))
         self.target_image.pack()
+        self.target_button.pack_forget()
 
     def next_context_image(self):
         if self.img_index < len(self.img_lst) - 1 and self.img_index != self.target_index - 1:
@@ -714,6 +724,7 @@ class ContextApp(object):
             self.new = self.context_img_canvas.create_image(self.max_x, self.max_y, image=self.context_img_canvas.img)
             self.context_img_canvas.itemconfig(self.new, image=self.context_img_canvas.img)
             self.context_path_label.config(text=re.sub('^(.*context/)', '', self.img_lst[self.img_index]))
+            self.target_button.pack()
             self.target_image.pack_forget()
         elif self.img_index == self.target_index - 1:
             self.open_image()
@@ -729,6 +740,7 @@ class ContextApp(object):
             self.new = self.context_img_canvas.create_image(self.max_x, self.max_y, image=self.context_img_canvas.img)
             self.context_img_canvas.itemconfig(self.new, image=self.context_img_canvas.img)
             self.context_path_label.config(text=re.sub('^(.*context/)', '', self.img_lst[self.img_index]))
+            self.target_button.pack()
             self.target_image.pack_forget()
         elif self.img_index == self.target_index + 1:
             self.open_image()
