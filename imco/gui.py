@@ -259,9 +259,12 @@ class ImcoTkApp(object):
         atexit.register(self.handle_delete_window)
 
     def install_bindings(self):
-        self.root.bind('<Left>', self.handle_prev_image)
-        self.root.bind('<Right>', self.handle_next_image)
-        self.root.bind('<Return>', self.handle_next_image)
+        if sys.platform != 'darwin':
+            # On macOS, the accelerators defined in the menu setup appear to
+            # automatically add bindings when no meta key is defined, which
+            # results in double events if we also add these bindings.
+            self.root.bind('<Left>', self.handle_prev_image)
+            self.root.bind('<Right>', self.handle_next_image)
         self.root.bind(meta_binding('Shift-Left'), self.handle_prev_skipped)
         self.root.bind(meta_binding('Shift-Right'), self.handle_next_skipped)
         self.root.bind(meta_binding('s'), self.handle_save)
