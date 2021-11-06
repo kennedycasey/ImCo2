@@ -124,7 +124,8 @@ class ImcoTkApp(object):
     def handle_object_entry(self, event=None):
         self.object_entry = simpledialog.askstring(
                 title="Add object name(s)",
-                prompt="Reminder: Make sure to add commas between names if there are 2+ objects")
+                prompt="Reminder: Make sure to add commas between names if there are 2+ objects",
+                parent=self.root)
         if self.object_entry is not None:
             self.object_name = Tk.Label(
                 self.info_frame,
@@ -148,7 +149,8 @@ class ImcoTkApp(object):
     def handle_comment_entry(self, event=None):
         self.comment_entry = simpledialog.askstring(
                 title="Add comments",
-                prompt="")
+                prompt="",
+                parent=self.root)
         if self.comment_entry is not None:
             self.comments = Tk.Label(
                 self.info_frame,
@@ -166,7 +168,7 @@ class ImcoTkApp(object):
             for img in img_lst:
                 if not img.is_coded(self.session.config.codes) or img.codes['Skipped'] is not None:
                     count+=1
-        tkmb.showinfo("", "Nice work! You have " + str(count) + " images left to code in this directory.")
+        self.info("Nice work! You have " + str(count) + " images left to code in this directory.")
 
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
@@ -278,7 +280,8 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('Right'), self.handle_frontier)
 
     def handle_open(self, event=None):
-        path = tkinter.filedialog.askdirectory(initialdir = os.getcwd(),
+        path = tkinter.filedialog.askdirectory(
+            initialdir = os.getcwd(),
             parent=self.root)
         # TODO: Handle empty path, missing files, etc.
         self.open_workdir(path)
@@ -337,7 +340,8 @@ class ImcoTkApp(object):
         fh = tkinter.filedialog.asksaveasfile(
                 mode='w',
                 defaultextension='.csv',
-                filetypes=[('CSV', '*.csv')])
+                filetypes=[('CSV', '*.csv')],
+                parent=self.root)
         if fh:
             self.session.export_to_csv(fh)
             fh.close()
@@ -356,14 +360,14 @@ class ImcoTkApp(object):
             self.draw_image()
             self.formatting()
         elif self.session.prev_dir():
-            tkmb.showinfo('', 'Going back to previous directory.')
+            self.info('Going back to previous directory.')
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
                     self.selected_image = None
             self.draw_image()
             self.formatting()
         else:
-            tkmb.showinfo('', 'This is the very first image.')
+            self.info('This is the very first image.')
 
     def prev_text(self):
         if self.session.img.object_name != '':
@@ -403,13 +407,13 @@ class ImcoTkApp(object):
         if self.session is None:
             return
         if not self.session.img_coded():
-            tkmb.showinfo('', "This image isn't fully coded yet.")
+            self.info("This image isn't fully coded yet.")
             return
         update_image = False
         if self.session.next_image():
             update_image = True
         elif self.session.next_dir():
-            tkmb.showinfo('', "Hooray! It's a brand new directory.")
+            self.info("Hooray! It's a brand new directory.")
             update_image = True
         else:
             finished = True
@@ -418,14 +422,14 @@ class ImcoTkApp(object):
                 for img in img_lst:
                     if img.codes['Skipped'] is not None or not img.is_coded(self.session.config.codes):
                         finished = False
-                        tkmb.showinfo("Almost done!", "Remember to code skipped images.")
+                        self.info("Remember to code skipped images.", title="Almost done!")
                         self.session.set_dir(self.session.dirs.index(dir))
                         self.session.img_index = img_lst.index(img) - 1
                         self.handle_next_image()
                         break
                 break
             if finished:
-                tkmb.showinfo("R U SRS???", "You reached the end! You're a coding god!")
+                self.info("You reached the end! You're a coding god!", title="R U SRS???")
         if update_image:
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
@@ -440,7 +444,7 @@ class ImcoTkApp(object):
         if self.session.next_image():
             update_image = True
         elif self.session.next_dir():
-            tkmb.showinfo('', "Hooray! It's a brand new directory.")
+            self.info("Hooray! It's a brand new directory.")
             update_image = True
         else:
             finished = True
@@ -450,14 +454,14 @@ class ImcoTkApp(object):
                 for img in img_lst:
                     if img.codes['Skipped'] is not None or not img.is_coded(self.session.config.codes):
                         finished = False
-                        tkmb.showinfo("Almost done!", "Remember to code skipped images.")
+                        self.info("Remember to code skipped images.", title="Almost done!")
                         self.session.set_dir(self.session.dirs.index(dir))
                         self.session.img_index = img_lst.index(img) - 1
                         self.handle_next_image()
                         break
                 break
             if finished:
-                tkmb.showinfo("R U SRS???", "You reached the end! You're a coding god!")
+                self.info("You reached the end! You're a coding god!", title="R U SRS???")
         if update_image:
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
@@ -492,7 +496,7 @@ class ImcoTkApp(object):
             self.session = ImcoSession(path)
         except imco.config.InvalidConfig:
             self.session = None
-            tkmb.showinfo('', "Invalid working directory: missing config.json")
+            self.info("Invalid working directory: missing config.json")
         if self.session is None:
             return
         self.app_state.set('workdir', path)
@@ -535,6 +539,9 @@ class ImcoTkApp(object):
             self.path_label.config(text=self.session.img_path)
             for code_label in self.code_labels:
                 code_label.set_from_image(self.session.img)
+
+    def info(self, msg, title=''):
+        tkmb.showinfo(title, msg, parent=self.root)
 
 class CodeLabel(object):
     UNSET_COLOR = '#8a8a8a'   # grey
@@ -732,7 +739,7 @@ class ContextApp(object):
         elif self.img_index == self.target_index - 1:
             self.open_image()
         else:
-            tkmb.showinfo("", "No more context images in this direction!\n\nReturning to the target image.")
+            self.info("No more context images in this direction!\n\nReturning to the target image.")
             self.open_image()
 
     def prev_context_image(self):
@@ -748,7 +755,7 @@ class ContextApp(object):
         elif self.img_index == self.target_index + 1:
             self.open_image()
         else:
-            tkmb.showinfo("", "No more context images in this direction!\n\nReturning to the target image.")
+            self.info("No more context images in this direction!\n\nReturning to the target image.")
             self.open_image()
 
     def build_fonts(self):
@@ -759,6 +766,9 @@ class ContextApp(object):
 
     def delete_window(self):
         self.root.destroy()
+
+    def info(self, msg, title=''):
+        tkmb.showinfo(title, msg, parent=self.root)
 
 if sys.platform == 'darwin':
     META_BINDING = 'Command'
