@@ -132,14 +132,13 @@ class ImcoTkApp(object):
                 bg = '#f6f6f6')
             self.object_name.pack(fill=Tk.X)
             self.object_undo_button.pack()
-            self.session.img.object_name = self.object_entry
-            self.session.modified_images[self.session.img.path] = self.session.img
+            self.session.set_image_object_name(self.object_entry)
 
     def remove_object_entry(self):
-        self.session.img.object_name = None
+        self.session.set_image_object_name('')
 
     def remove_comment_entry(self):
-        self.session.img.comments = None
+        self.session.set_image_comments('')
 
     def handle_comment_entry(self, event=None):
         self.comment_entry = simpledialog.askstring(
@@ -153,8 +152,7 @@ class ImcoTkApp(object):
                 bg = '#f6f6f6')
             self.comments.pack(fill=Tk.X)
             self.comment_undo_button.pack()
-            self.session.img.comments = self.comment_entry
-            self.session.modified_images[self.session.img.path] = self.session.img
+            self.session.set_image_comments(self.comment_entry)
 
     def handle_check_progress(self, event=None):
         count = 0

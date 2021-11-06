@@ -116,6 +116,13 @@ class ImcoSession(object):
                 self.img.object_name = self.dir._images[self.img_index-1].object_name
             self.modified_images[self.img.path] = self.img
 
+    def set_image_object_name(self, object_name):
+        self.img.object_name = object_name
+        self.modified_images[self.img.path] = self.img
+
+    def set_image_comments(self, comments):
+        self.img.comments = comments
+        self.modified_images[self.img.path] = self.img
 
     def img_coded(self):
         return self.img is not None and self.img.is_coded(self.config.codes)
@@ -163,8 +170,8 @@ class ImcoImage(object):
         self.dir = os.path.basename(dirname)
         self._modified = None
         self.codes = dict((c.code, None) for c in codes)
-        self.comments = ''
-        self.object_name = ''
+        self._comments = ''
+        self._object_name = ''
 
     @property
     def timestamp(self):
@@ -177,17 +184,30 @@ class ImcoImage(object):
             db_value = row.get(code.code)
             if db_value is not None:
                 self.codes[code.code] = code.from_db(db_value)
-        self.comments = row['Comments']
-        self.object_name = row['Object']
+        self._comments = row['Comments']
+        self._object_name = row['Object']
 
     def code(self, code, value):
         self.codes[code.code] = value
         self._modified = datetime.datetime.now()
 
-    def text(self, comments, object_name):
-        self.comments = comments
-        self.object_name = object_name
+    @property
+    def object_name(self):
+        return self._object_name
 
+    @object_name.setter
+    def object_name(self, object_name):
+        self._object_name = object_name
+        self._modified = datetime.datetime.now()
+
+    @property
+    def comments(self):
+        return self._comments
+
+    @comments.setter
+    def comments(self, comments):
+        self._comments = comments
+        self._modified = datetime.datetime.now()
 
     def is_coded(self, codes):
         missing_required = False
@@ -195,7 +215,7 @@ class ImcoImage(object):
             value = self.codes.get(code.code)
             if code.exception and value is not None:
                 return True
-            elif code.exception and value is None and self.object_name=='':
+            elif code.exception and value is None and self._object_name == '':
                 missing_required = True
             elif code.required and value is None:
                 missing_required = True
