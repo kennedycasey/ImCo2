@@ -112,12 +112,12 @@ class ImcoTkApp(object):
         self.entrymenu.add_command(
             label='Add object name',
             command=self.handle_object_entry,
-            accelerator=meta_accelerator('N'),
+            accelerator=meta_accelerator('L'),
             state=Tk.DISABLED)
         self.entrymenu.add_command(
             label='Add comment',
             command=self.handle_comment_entry,
-            accelerator=meta_accelerator('T'),
+            accelerator=meta_accelerator('U'),
             state=Tk.DISABLED)
         self.root.config(menu=self.menubar)
 
@@ -270,8 +270,8 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('i'), self.handle_open_image)
         self.root.bind(meta_binding('c'), self.handle_open_context)
         self.root.bind(meta_binding('p'), self.handle_check_progress)
-        self.root.bind(meta_binding('n'), self.handle_object_entry)
-        self.root.bind(meta_binding('t'), self.handle_comment_entry)
+        self.root.bind(meta_binding('l'), self.handle_object_entry)
+        self.root.bind(meta_binding('u'), self.handle_comment_entry)
         self.root.bind(meta_binding('Right'), self.handle_frontier)
 
     def handle_open(self, event=None):
@@ -759,7 +759,7 @@ class ContextApp(object):
 
 if sys.platform == 'darwin':
     META_BINDING = 'Command'
-    META_ACCELERATOR = 'Cmd'
+    META_ACCELERATOR = 'Command'
 else:
     META_BINDING = 'Control'
     META_ACCELERATOR = 'Ctrl'
