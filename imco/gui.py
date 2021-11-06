@@ -26,6 +26,7 @@ class ImcoTkApp(object):
 
     def __init__(self, app_state):
         self.root = Tk.Tk()
+        self._handled_delete_window = False
         #self.top = Toplevel()
         self.app_state = app_state
         self.session = None
@@ -321,10 +322,13 @@ class ImcoTkApp(object):
             self.session.save()
 
     def handle_delete_window(self):
+        if self._handled_delete_window:
+            return
         if self.session is not None:
             self.session.save()
         self.app_state.save()
         self.root.destroy()
+        self._handled_delete_window = True
 
     def handle_export(self, event=None):
         if  self.session is None:
