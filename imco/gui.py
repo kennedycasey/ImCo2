@@ -135,10 +135,14 @@ class ImcoTkApp(object):
             self.object_undo_button.pack()
             self.session.set_image_object_name(self.object_entry)
 
-    def remove_object_entry(self):
+    def handle_remove_object_entry(self):
+        self.object_undo_button.pack_forget()
+        self.object_name.destroy()
         self.session.set_image_object_name('')
 
-    def remove_comment_entry(self):
+    def handle_remove_comment_entry(self):
+        self.comment_undo_button.pack_forget()
+        self.comments.destroy()
         self.session.set_image_comments('')
 
     def handle_comment_entry(self, event=None):
@@ -211,20 +215,14 @@ class ImcoTkApp(object):
             text = 'Undo object entry',
             bg = DEFAULT_BG,
             highlightbackground = DEFAULT_BG,
-            command = lambda:[self.object_undo_button.pack_forget(),
-                self.object_name.destroy(),
-                self.remove_object_entry(),
-                self.session.save()]
+            command = self.handle_remove_object_entry
         )
         self.comment_undo_button = Tk.Button(
             self.info_frame,
             text = 'Undo comment entry',
             bg = DEFAULT_BG,
             highlightbackground = DEFAULT_BG,
-            command = lambda:[self.comment_undo_button.pack_forget(),
-                self.comments.destroy(),
-                self.remove_comment_entry(),
-                self.session.save()]
+            command = self.handle_remove_comment_entry
         )
         self.img_canvas = Tk.Canvas(
                 self.root,
