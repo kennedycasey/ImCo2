@@ -36,6 +36,7 @@ class ImcoTkApp(object):
         self.photo_img = None
         self.selected_image = None
         self.prev_selected_image = None
+        self.prev_viewed_img_index = None
         self.build_menu()
         self.build_main_window()
         self.install_bindings()
@@ -135,16 +136,19 @@ class ImcoTkApp(object):
             self.object_name.pack(fill=Tk.X)
             self.object_undo_button.pack()
             self.session.set_image_object_name(self.object_entry)
+            self.session.save()
 
     def handle_remove_object_entry(self):
         self.object_undo_button.pack_forget()
         self.object_name.destroy()
         self.session.set_image_object_name('')
+        self.session.save()
 
     def handle_remove_comment_entry(self):
         self.comment_undo_button.pack_forget()
         self.comments.destroy()
         self.session.set_image_comments('')
+        self.session.save()
 
     def handle_comment_entry(self, event=None):
         self.comment_entry = simpledialog.askstring(
@@ -160,6 +164,7 @@ class ImcoTkApp(object):
             self.comments.pack(fill=Tk.X)
             self.comment_undo_button.pack()
             self.session.set_image_comments(self.comment_entry)
+            self.session.save()
 
     def handle_check_progress(self, event=None):
         count = 0
@@ -349,14 +354,18 @@ class ImcoTkApp(object):
     def handle_code(self, code, value):
         if self.session:
             self.session.code_image(code, value)
+        self.session.save()
 
     def handle_prev_image(self, event=None):
         if self.session is None:
             return
+        if self.session.img.codes['Repeated'] is not None and self.session.img_index != self.prev_viewed_img_index + 1:
+                self.info("Hold up! You're viewing images out of order. Double check that this image matches the preceding image in time.")
         if self.session.prev_image():
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
                     self.selected_image = None
+            self.set_prev_viewed_image()
             self.draw_image()
             self.formatting()
         elif self.session.prev_dir():
@@ -364,10 +373,12 @@ class ImcoTkApp(object):
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
                     self.selected_image = None
+            self.set_prev_viewed_image()
             self.draw_image()
             self.formatting()
         else:
             self.info('This is the very first image.')
+
 
     def prev_text(self):
         if self.session.img.object_name != '':
@@ -404,12 +415,18 @@ class ImcoTkApp(object):
         self.prev_text()
 
     def handle_next_image(self, event=None):
+        print(self.session.img_index)
+        print(self.prev_viewed_img_index)
         if self.session is None:
             return
+        if self.session.img.codes['Repeated'] is not None and self.session.img_index == 0:
+            self.info("Whoops! This is the very first image, so it can't be coded as same as previous image.")
         if not self.session.img_coded():
             self.info("This image isn't fully coded yet.")
             return
         update_image = False
+        if self.session.img.codes['Repeated'] is not None and self.session.img_index != self.prev_viewed_img_index + 1 and self.session.img_index != 0:
+                self.info("Hold up! You're viewing images out of order. Double check that this image matches the preceding image in time.")
         if self.session.next_image():
             update_image = True
         elif self.session.next_dir():
@@ -434,13 +451,19 @@ class ImcoTkApp(object):
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
                     self.selected_image = None
+            self.set_prev_viewed_image()
             self.draw_image()
             self.formatting()
 
     def handle_next_image_conditional(self, event=None):
         if self.session is None:
             return
+        if self.session.img.codes['Repeated'] is not None and self.session.img_index == 0:
+            self.info("Whoops! This is the very first image, so it can't be coded as same as previous image.")
+            return
         update_image = False
+        if self.session.img.codes['Repeated'] is not None and self.session.img != self.session.img_index + 1 and self.session.img_index != 0:
+                self.info("Hold up! You're viewing images out of order. Double check that this image matches the preceding image in time.")
         if self.session.next_image():
             update_image = True
         elif self.session.next_dir():
@@ -448,7 +471,6 @@ class ImcoTkApp(object):
             update_image = True
         else:
             finished = True
-            self.session.save()
             for dir in self.session.dirs:
                 img_lst = self.session.load_images(dir)
                 for img in img_lst:
@@ -466,6 +488,7 @@ class ImcoTkApp(object):
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
                     self.selected_image = None
+            self.set_prev_viewed_image()
             self.draw_image()
             self.formatting()
 
@@ -473,6 +496,7 @@ class ImcoTkApp(object):
         if self.session is None:
             return
         self.session.jump_to_frontier_image()
+        self.set_prev_viewed_image()
         self.draw_image()
 
     def handle_prev_skipped(self, event=None):
@@ -518,6 +542,9 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Previous Skipped', state=Tk.NORMAL)
         self.entrymenu.entryconfig('Add object name', state=Tk.NORMAL)
         self.entrymenu.entryconfig('Add comment', state=Tk.NORMAL)
+
+    def set_prev_viewed_image(self):
+        self.prev_viewed_img_index = self.session.img_index
 
     def draw_image(self):
         if self.selected_image is not None:
