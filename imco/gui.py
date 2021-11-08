@@ -64,7 +64,7 @@ class ImcoTkApp(object):
         self.filemenu.add_command(
                 label='View context',
                 command=self.handle_open_context,
-                accelerator=meta_accelerator('C'),
+                accelerator=meta_accelerator('V'),
                 state=Tk.DISABLED)
         self.filemenu.add_command(
                 label='Save',
@@ -278,7 +278,7 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('e'), self.handle_export)
         self.root.bind(meta_binding('o'), self.handle_open)
         self.root.bind(meta_binding('i'), self.handle_open_image)
-        self.root.bind(meta_binding('c'), self.handle_open_context)
+        self.root.bind(meta_binding('v'), self.handle_open_context)
         self.root.bind(meta_binding('p'), self.handle_check_progress)
         self.root.bind(meta_binding('l'), self.handle_object_entry)
         self.root.bind(meta_binding('u'), self.handle_comment_entry)
