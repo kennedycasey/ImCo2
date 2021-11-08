@@ -320,7 +320,7 @@ class ImcoTkApp(object):
         img_lst = []
         for index, path in enumerate(paths):
             current_index = paths.index(context_image_path)
-            if index <= current_index + 10 and index >= current_index - 10:
+            if index <= current_index + 20 and index >= current_index - 20:
                 img_lst.append(path)
         max_x = self.session.config.image_max_x
         max_y = self.session.config.image_max_y
