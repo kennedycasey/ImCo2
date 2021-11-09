@@ -126,6 +126,8 @@ class ImcoTkApp(object):
         self.root.config(menu=self.menubar)
 
     def handle_object_entry(self, event=None):
+        if self.session.img.object_name != '':
+            self.handle_remove_object_entry()
         self.object_entry = simpledialog.askstring(
                 title="Add object name(s)",
                 prompt="Reminder: Make sure to add commas between names if there are 2+ objects",
@@ -151,6 +153,8 @@ class ImcoTkApp(object):
         self.session.set_image_comments('')
 
     def handle_comment_entry(self, event=None):
+        if self.session.img.comments != '':
+            self.handle_remove_comment_entry()
         self.comment_entry = simpledialog.askstring(
                 title="Add comments",
                 prompt="",
