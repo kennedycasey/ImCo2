@@ -195,6 +195,21 @@ class ImcoTkApp(object):
                 justify=Tk.LEFT,
                 bg=DEFAULT_BG)
         self.path_label.pack(fill=Tk.X)
+        self.order_section_label = Tk.Label(
+                self.info_frame,
+                anchor=Tk.W,
+                justify=Tk.LEFT,
+                font=self.section_font,
+                fg=SECTION_FG,
+                bg=DEFAULT_BG,
+                text='IMAGE NUMBER')
+        self.order_section_label.pack(fill=Tk.X, pady=(10, 0))
+        self.order_label = Tk.Label(
+            self.info_frame,
+                anchor=Tk.W,
+                justify=Tk.LEFT,
+                bg=DEFAULT_BG)
+        self.order_label.pack(fill=Tk.X)
         self.codes_section_label = Tk.Label(
                 self.info_frame,
                 anchor=Tk.W,
@@ -565,6 +580,7 @@ class ImcoTkApp(object):
             y = self.session.config.image_max_y / 2.42 - 1
             self.img_canvas.create_image(x, y, image=self.photo_img)
             self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
+            self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
             for code_label in self.code_labels:
                 code_label.set_from_image(self.session.img)
             self.prev_selected_image = self.selected_image
@@ -576,6 +592,7 @@ class ImcoTkApp(object):
             y = self.session.config.image_max_y / 2.42 - 1
             self.img_canvas.create_image(x, y, image=self.photo_img)
             self.path_label.config(text=self.session.img_path)
+            self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
             for code_label in self.code_labels:
                 code_label.set_from_image(self.session.img)
 
