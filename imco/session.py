@@ -110,10 +110,6 @@ class ImcoSession(object):
     def code_image(self, code, value):
         self.img.code(code, value)
         if self.img.is_coded(self.config.codes):
-            if self.img.codes['Repeated'] is not None:
-                self.img.codes = self.dir._images[self.img_index-1].codes
-                self.img.comments = self.dir._images[self.img_index-1].comments
-                self.img.object_name = self.dir._images[self.img_index-1].object_name
             self.modified_images[self.img.path] = self.img
 
     def set_image_object_name(self, object_name):

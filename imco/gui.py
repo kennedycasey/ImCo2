@@ -27,7 +27,6 @@ class ImcoTkApp(object):
     def __init__(self, app_state):
         self.root = Tk.Tk()
         self._handled_delete_window = False
-        #self.top = Toplevel()
         self.app_state = app_state
         self.session = None
         # A list of CodeLabel instances.
@@ -64,7 +63,7 @@ class ImcoTkApp(object):
         self.filemenu.add_command(
                 label='View context',
                 command=self.handle_open_context,
-                accelerator=meta_accelerator('V'),
+                accelerator=meta_accelerator('C'),
                 state=Tk.DISABLED)
         self.filemenu.add_command(
                 label='Save',
@@ -108,6 +107,10 @@ class ImcoTkApp(object):
             command=self.handle_prev_skipped,
             accelerator=meta_accelerator('Shift-Left'),
             state=Tk.DISABLED)
+        self.imagemenu.add_command(
+            label='Same as previous image',
+            command=self.handle_repeated,
+            accelerator=meta_accelerator('.'))
         self.entrymenu = Tk.Menu(self.root)
         self.menubar.add_cascade(label='Text Entry', menu=self.entrymenu)
         self.entrymenu.add_command(
@@ -136,19 +139,16 @@ class ImcoTkApp(object):
             self.object_name.pack(fill=Tk.X)
             self.object_undo_button.pack()
             self.session.set_image_object_name(self.object_entry)
-            self.session.save()
 
     def handle_remove_object_entry(self):
         self.object_undo_button.pack_forget()
         self.object_name.destroy()
         self.session.set_image_object_name('')
-        self.session.save()
 
     def handle_remove_comment_entry(self):
         self.comment_undo_button.pack_forget()
         self.comments.destroy()
         self.session.set_image_comments('')
-        self.session.save()
 
     def handle_comment_entry(self, event=None):
         self.comment_entry = simpledialog.askstring(
@@ -164,7 +164,6 @@ class ImcoTkApp(object):
             self.comments.pack(fill=Tk.X)
             self.comment_undo_button.pack()
             self.session.set_image_comments(self.comment_entry)
-            self.session.save()
 
     def handle_check_progress(self, event=None):
         count = 0
@@ -278,11 +277,12 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('e'), self.handle_export)
         self.root.bind(meta_binding('o'), self.handle_open)
         self.root.bind(meta_binding('i'), self.handle_open_image)
-        self.root.bind(meta_binding('v'), self.handle_open_context)
+        self.root.bind(meta_binding('c'), self.handle_open_context)
         self.root.bind(meta_binding('p'), self.handle_check_progress)
         self.root.bind(meta_binding('l'), self.handle_object_entry)
         self.root.bind(meta_binding('u'), self.handle_comment_entry)
         self.root.bind(meta_binding('Right'), self.handle_frontier)
+        self.root.bind(meta_binding('.'), self.handle_repeated)
 
     def handle_open(self, event=None):
         path = tkinter.filedialog.askdirectory(
@@ -292,6 +292,7 @@ class ImcoTkApp(object):
         self.open_workdir(path)
 
     def handle_open_image(self, event=None):
+        self.set_prev_viewed_image()
         try:
             self.selected_image.destroy()
         except AttributeError:
@@ -305,12 +306,13 @@ class ImcoTkApp(object):
         for index in range(len(img_lst)):
             if img_lst[index].path==self.selected_image:
                 self.session.img_index = index-1
+                self.check_prev = True
                 self.handle_next_image_conditional()
                 break
 
 
-    #Makes list of image paths within 10 of the selected image and adds them to ContextApp
-    #for creation of context images interface.
+    # Makes list of image paths within 20 of the selected image and adds them to
+    # ContextApp for creation of context images interface.
     def handle_open_context(self, event=None):
         current_image_path = self.session.img.path
         self.current_dir_path = re.sub('([^\/]+$)', '', current_image_path)
@@ -354,13 +356,32 @@ class ImcoTkApp(object):
     def handle_code(self, code, value):
         if self.session:
             self.session.code_image(code, value)
-        self.session.save()
+
+    def handle_repeated(self, event=None):
+        if self.session.img_index == 0:
+            self.info("Whoops! This is the very first image, so it can't be coded as same as previous image.")
+        elif self.session.img_index != self.prev_viewed_img_index + 1:
+            self.info("Hold up! You're viewing images out of order. Double check that this image matches the preceding image in time.")
+        else:
+            self.session.img.codes = self.session.dir._images[self.session.img_index-1].codes
+            for code_label in self.code_labels:
+                code_label.set_from_image(self.session.img)
+            try:
+                self.handle_remove_object_entry()
+            except AttributeError:
+                pass
+            try:
+                self.handle_remove_comment_entry()
+            except AttributeError:
+                pass
+            self.session.set_image_comments(self.session.dir._images[self.session.img_index-1].comments)
+            self.session.set_image_object_name(self.session.dir._images[self.session.img_index-1].object_name)
+            self.prev_text()
 
     def handle_prev_image(self, event=None):
         if self.session is None:
             return
-        if self.session.img.codes['Repeated'] is not None and self.session.img_index != self.prev_viewed_img_index + 1:
-                self.info("Hold up! You're viewing images out of order. Double check that this image matches the preceding image in time.")
+        self.set_prev_viewed_image()
         if self.session.prev_image():
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
@@ -378,7 +399,6 @@ class ImcoTkApp(object):
             self.formatting()
         else:
             self.info('This is the very first image.')
-
 
     def prev_text(self):
         if self.session.img.object_name != '':
@@ -415,18 +435,13 @@ class ImcoTkApp(object):
         self.prev_text()
 
     def handle_next_image(self, event=None):
-        print(self.session.img_index)
-        print(self.prev_viewed_img_index)
+        self.set_prev_viewed_image()
         if self.session is None:
             return
-        if self.session.img.codes['Repeated'] is not None and self.session.img_index == 0:
-            self.info("Whoops! This is the very first image, so it can't be coded as same as previous image.")
         if not self.session.img_coded():
             self.info("This image isn't fully coded yet.")
             return
         update_image = False
-        if self.session.img.codes['Repeated'] is not None and self.session.img_index != self.prev_viewed_img_index + 1 and self.session.img_index != 0:
-                self.info("Hold up! You're viewing images out of order. Double check that this image matches the preceding image in time.")
         if self.session.next_image():
             update_image = True
         elif self.session.next_dir():
@@ -434,6 +449,7 @@ class ImcoTkApp(object):
             update_image = True
         else:
             finished = True
+            self.session.save()
             for dir in self.session.dirs:
                 img_lst = self.session.load_images(dir)
                 for img in img_lst:
@@ -451,19 +467,13 @@ class ImcoTkApp(object):
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
                     self.selected_image = None
-            self.set_prev_viewed_image()
             self.draw_image()
             self.formatting()
 
     def handle_next_image_conditional(self, event=None):
         if self.session is None:
             return
-        if self.session.img.codes['Repeated'] is not None and self.session.img_index == 0:
-            self.info("Whoops! This is the very first image, so it can't be coded as same as previous image.")
-            return
         update_image = False
-        if self.session.img.codes['Repeated'] is not None and self.session.img != self.session.img_index + 1 and self.session.img_index != 0:
-                self.info("Hold up! You're viewing images out of order. Double check that this image matches the preceding image in time.")
         if self.session.next_image():
             update_image = True
         elif self.session.next_dir():
@@ -488,7 +498,6 @@ class ImcoTkApp(object):
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
                     self.selected_image = None
-            self.set_prev_viewed_image()
             self.draw_image()
             self.formatting()
 
@@ -496,22 +505,25 @@ class ImcoTkApp(object):
         if self.session is None:
             return
         self.session.jump_to_frontier_image()
-        self.set_prev_viewed_image()
         self.draw_image()
 
     def handle_prev_skipped(self, event=None):
+        self.set_prev_viewed_image()
         img_lst = self.session.load_images(self.session.dir)
         for index in reversed(range(self.session.img_index)):
             if img_lst[index].codes['Skipped'] != None:
                 self.session.img_index = index-1
+                self.check_prev = True
                 self.handle_next_image_conditional()
                 break
 
     def handle_next_skipped(self, event=None):
+        self.set_prev_viewed_image()
         img_lst = self.session.load_images(self.session.dir)
         for index in range(self.session.img_index+1, len(img_lst)):
             if img_lst[index].codes['Skipped'] != None:
                 self.session.img_index = index-1
+                self.check_prev = True
                 self.handle_next_image_conditional()
                 break
 
@@ -735,6 +747,12 @@ class ContextApp(object):
             text = 'You are currently viewing the target image.',
             fg = '#05976c',
             bg = DEFAULT_BG)
+        self.target_button = Tk.Button(
+            self.info_frame,
+            text = 'Go to target image',
+            bg = DEFAULT_BG,
+            highlightbackground = DEFAULT_BG,
+            command = self.go_to_target)
         self.context_img_canvas = Tk.Canvas(self.root,
             bg=CANVAS_BG,
             highlightthickness=0)
@@ -763,6 +781,7 @@ class ContextApp(object):
             self.context_path_label.config(text=re.sub('^(.*context/)', '', self.img_lst[self.img_index]))
             self.target_button.pack()
             self.target_image.pack_forget()
+            self.target_button.pack()
         elif self.img_index == self.target_index - 1:
             self.open_image()
         else:
@@ -779,10 +798,16 @@ class ContextApp(object):
             self.context_path_label.config(text=re.sub('^(.*context/)', '', self.img_lst[self.img_index]))
             self.target_button.pack()
             self.target_image.pack_forget()
+            self.target_button.pack()
         elif self.img_index == self.target_index + 1:
             self.open_image()
         else:
             self.info("No more context images in this direction!\n\nReturning to the target image.")
+            self.open_image()
+
+    def go_to_target(self):
+        if self.img_index != self.target_index:
+            self.target_button.pack_forget()
             self.open_image()
 
     def build_fonts(self):

@@ -1,12 +1,6 @@
 {
   "codes": [
       {
-          "code": "Repeated",
-          "label": "Same as previous image",
-          "key": ".",
-          "exception": true
-      },
-      {
           "code": "StudyRelated",
           "label": "Study-related object",
           "key": "X"
