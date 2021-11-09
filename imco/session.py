@@ -206,13 +206,11 @@ class ImcoImage(object):
         self._modified = datetime.datetime.now()
 
     def is_coded(self, codes):
-        missing_required = False
         for code in codes:
             value = self.codes.get(code.code)
             if code.exception and value is not None:
                 return True
-            elif code.exception and value is None and self._object_name == '':
-                missing_required = True
-            elif code.required and value is None:
-                missing_required = True
-        return not missing_required
+            elif not code.exception and value is not None:
+                if self._object_name != '':
+                    return True
+        return False
