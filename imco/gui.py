@@ -9,6 +9,7 @@ import os
 import sys
 import re
 import glob
+import datetime
 
 from imco.version import VERSION
 from imco.session import ImcoSession
@@ -366,9 +367,18 @@ class ImcoTkApp(object):
     def handle_export(self, event=None):
         if  self.session is None:
             return
+        self.initials = simpledialog.askstring(
+            title = 'Enter your initials',
+            prompt = '',
+            parent = self.root)
+        time = datetime.datetime.now()
+        time_rep = str(time.year) + str(time.month) + str(time.day) + '_' + str(time.hour) + str(time.minute)
+        path = re.sub('/', '', re.sub('([^\/]+$)', '', self.session.img_path))
+        name = path + '_' + self.initials + '_' + time_rep
         fh = tkinter.filedialog.asksaveasfile(
                 mode='w',
                 defaultextension='.csv',
+                initialfile = name,
                 filetypes=[('CSV', '*.csv')],
                 parent=self.root)
         if fh:
