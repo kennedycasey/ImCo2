@@ -316,19 +316,19 @@ class ImcoTkApp(object):
             self.selected_image.destroy()
         except AttributeError:
             pass
-        self.selected_image=tkinter.filedialog.askopenfilename(
-                    initialdir = os.getcwd(),
-                    filetypes=[("image", "*.gif")],
-                    parent=self.root)
+        current_image_path = self.session.img.path
+        self.current_dir_path = re.sub('([^\/]+$)', '', current_image_path)
+        self.selected_image = tkinter.filedialog.askopenfilename(
+                    initialdir = self.current_dir_path,
+                    filetypes = [("image", "*.gif")],
+                    parent = self.root)
         self.session.save()
         img_lst = self.session.load_images(self.session.dir)
         for index in range(len(img_lst)):
             if img_lst[index].path==self.selected_image:
                 self.session.img_index = index-1
-                self.check_prev = True
                 self.handle_next_image_conditional()
                 break
-
 
     # Makes list of image paths within 20 of the selected image and adds them to
     # ContextApp for creation of context images interface.
@@ -535,7 +535,6 @@ class ImcoTkApp(object):
         for index in reversed(range(self.session.img_index)):
             if img_lst[index].codes['Skipped'] != None:
                 self.session.img_index = index-1
-                self.check_prev = True
                 self.handle_next_image_conditional()
                 break
 
@@ -545,7 +544,6 @@ class ImcoTkApp(object):
         for index in range(self.session.img_index+1, len(img_lst)):
             if img_lst[index].codes['Skipped'] != None:
                 self.session.img_index = index-1
-                self.check_prev = True
                 self.handle_next_image_conditional()
                 break
 
@@ -581,7 +579,7 @@ class ImcoTkApp(object):
         self.prev_viewed_img_index = self.session.img_index
 
     def draw_image(self):
-        if self.selected_image is not None:
+        if self.selected_image is not None and len(self.selected_image)>0:
             self.photo_img = Tk.PhotoImage(file=self.selected_image)
             x = self.session.config.image_max_x / 2 - 1
             y = self.session.config.image_max_y / 2.42 - 1
