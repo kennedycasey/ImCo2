@@ -454,13 +454,13 @@ class ImcoTkApp(object):
         self.prev_text()
 
     def handle_next_image(self, event=None):
-        self.set_prev_viewed_image()
         if self.session is None:
             return
         if not self.session.img_coded():
             self.info("This image isn't fully coded yet.")
             return
         update_image = False
+        self.set_prev_viewed_image()
         if self.session.next_image():
             update_image = True
         elif self.session.next_dir():
