@@ -755,8 +755,8 @@ class ContextApp(object):
         self.current_index = self.img_lst.index(self.img_path)
         self.img_index = self.current_index
         self.target_index = self.current_index
-        self.max_x = max_x / 2.2
-        self.max_y = max_y / 2.55
+        self.max_x = max_x / 2.05
+        self.max_y = max_y / 2.5
         self.build_popup_window()
         self.open_image()
 
@@ -819,7 +819,7 @@ class ContextApp(object):
             bg=CANVAS_BG,
             highlightthickness=0)
         self.context_img_canvas.grid(column=1, row=0)
-        self.context_img_canvas.config(width=DEFAULT_CANVAS_SIZE + 200, height=DEFAULT_CANVAS_SIZE)
+        self.context_img_canvas.config(width=DEFAULT_CANVAS_SIZE + 300, height=DEFAULT_CANVAS_SIZE + 200)
         self.root.grid_columnconfigure(0, minsize=INFO_FRAME_WIDTH)
         self.root.update()
         self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
