@@ -401,7 +401,8 @@ class ImcoTkApp(object):
         elif self.session.img_index != self.prev_viewed_img_index + 1:
             self.info("Hold up! You're viewing images out of order. Double check that this image matches the preceding image in time.")
         else:
-            self.session.img.codes = self.session.dir._images[self.session.img_index-1].codes
+            self.session.set_image_repeated(self.session.dir._images[self.session.img_index-1].codes.copy())
+            self.session.img.codes = self.session.img.repeated
             for code_label in self.code_labels:
                 code_label.set_from_image(self.session.img)
             try:

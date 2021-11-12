@@ -120,6 +120,10 @@ class ImcoSession(object):
         self.img.comments = comments
         self.modified_images[self.img.path] = self.img
 
+    def set_image_repeated(self, repeated):
+        self.img.repeated = repeated
+        self.modified_images[self.img.path] = self.img
+
     def img_coded(self):
         return self.img is not None and self.img.is_coded(self.config.codes)
 
@@ -168,6 +172,7 @@ class ImcoImage(object):
         self.codes = dict((c.code, None) for c in codes)
         self._comments = ''
         self._object_name = ''
+        self._repeated = {}
 
     @property
     def timestamp(self):
@@ -203,6 +208,15 @@ class ImcoImage(object):
     @comments.setter
     def comments(self, comments):
         self._comments = comments
+        self._modified = datetime.datetime.now()
+
+    @property
+    def repeated(self):
+        return self._repeated
+
+    @repeated.setter
+    def repeated(self, repeated):
+        self._repeated = repeated
         self._modified = datetime.datetime.now()
 
     def is_coded(self, codes):
