@@ -51,18 +51,18 @@
           "key": "M"
       },
       {
-          "code": "ToolBetelNut",
-          "label": "Tool (to chew betelnut)",
+          "code": "OtherLargeImmovable",
+          "label": "Other large, immovable object",
           "key": "H"
       },
       {
           "code": "OtherSynthetic",
-          "label": "Other object (synthetic/manmade)",
+          "label": "Other synthetic/manmade object",
           "key": "S"
       },
       {
           "code": "OtherNatural",
-          "label": "Other object (natural)",
+          "label": "Other natural object",
           "key": "N"
       },
       {
