@@ -725,8 +725,8 @@ class ContextApp(object):
         self.current_index = self.img_lst.index(self.img_path)
         self.img_index = self.current_index
         self.target_index = self.current_index
-        self.max_x = max_x / 2-1
-        self.max_y = max_y / 2.42-1
+        self.max_x = max_x / 2.2
+        self.max_y = max_y / 2.55
         self.build_popup_window()
         self.open_image()
 
