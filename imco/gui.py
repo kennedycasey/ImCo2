@@ -322,10 +322,10 @@ class ImcoTkApp(object):
         path = tkinter.filedialog.askdirectory(
             initialdir = os.getcwd(),
             parent=self.root)
-        # TODO: Handle empty path, missing files, etc.
-        self.open_workdir(path)
         if os.path.exists(path + '/state.db'):
             self.info("Wait a second! A state.db file already exists in your workdir. Make sure to close the program and delete this file if it's from an old image directory.")
+        # TODO: Handle empty path, missing files, etc.
+        self.open_workdir(path)
         if len(self.session.dirs) > 1:
             self.info("FYI: There are " + str(len(self.session.dirs)) + " image directories in your workdir. Close the program and remove any directories if needed.")
 
