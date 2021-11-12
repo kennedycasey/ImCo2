@@ -94,6 +94,11 @@ class ImcoTkApp(object):
                 accelerator='Right',
                 state=Tk.DISABLED)
         self.imagemenu.add_command(
+                label='Beginning',
+                command = self.handle_first,
+                accelerator = meta_accelerator('Left'),
+                state = Tk.DISABLED)
+        self.imagemenu.add_command(
                 label='End',
                 command=self.handle_frontier,
                 accelerator=meta_accelerator('Right'),
@@ -302,6 +307,7 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('l'), self.handle_object_entry)
         self.root.bind(meta_binding('u'), self.handle_comment_entry)
         self.root.bind(meta_binding('Right'), self.handle_frontier)
+        self.root.bind(meta_binding('Left'), self.handle_first)
         self.root.bind(meta_binding('.'), self.handle_repeated)
 
     def handle_open(self, event=None):
@@ -539,6 +545,12 @@ class ImcoTkApp(object):
         self.session.jump_to_frontier_image()
         self.draw_image()
 
+    def handle_first(self, event=None):
+        if self.session is None:
+            return
+        self.session.img_index = 1
+        self.handle_prev_image()
+
     def handle_prev_skipped(self, event=None):
         self.set_prev_viewed_image()
         img_lst = self.session.load_images(self.session.dir)
@@ -579,6 +591,7 @@ class ImcoTkApp(object):
         self.filemenu.entryconfig('Check progress', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
+        self.imagemenu.entryconfig('Beginning', state=Tk.NORMAL)
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next Skipped', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Previous Skipped', state=Tk.NORMAL)
