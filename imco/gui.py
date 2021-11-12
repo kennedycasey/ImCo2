@@ -395,8 +395,11 @@ class ImcoTkApp(object):
             prompt = '',
             parent = self.root)
         time = datetime.datetime.now()
-        time_rep = str(time.year) + str(time.month) + str(time.day) + '_' + str(time.hour) + str(time.minute)
-        path = re.sub('/', '', re.sub('([^\/]+$)', '', self.session.img_path))
+        time_rep = str(time.year) + str(time.month).zfill(2) + str(time.day).zfill(2) + '_' + str(time.hour).zfill(2) + str(time.minute).zfill(2)
+        if len(self.session.dirs)>1:
+            path = 'multiple-dirs'
+        else:
+            path = re.sub('/', '', re.sub('([^\/]+$)', '', self.session.img_path))
         name = path + '_' + self.initials + '_' + time_rep
         fh = tkinter.filedialog.asksaveasfile(
                 mode='w',
