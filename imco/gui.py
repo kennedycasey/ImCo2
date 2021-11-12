@@ -325,7 +325,9 @@ class ImcoTkApp(object):
         # TODO: Handle empty path, missing files, etc.
         self.open_workdir(path)
         if os.path.exists(path + '/state.db'):
-            self.info("FYI: a state.db file already exists in your workdir!\n\nMake sure to close the program and delete this file if it's from an old image directory.")
+            self.info("Wait a second! A state.db file already exists in your workdir. Make sure to close the program and delete this file if it's from an old image directory.")
+        if len(self.session.dirs) > 1:
+            self.info("FYI: There are " + str(len(self.session.dirs)) + " image directories in your workdir. Close the program and remove any directories if needed.")
 
     def handle_open_image(self, event=None):
         self.set_prev_viewed_image()
