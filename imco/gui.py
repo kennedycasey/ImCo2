@@ -365,7 +365,6 @@ class ImcoTkApp(object):
         if not os.path.isdir(context_path):
             self.info("Context not found! Make sure the 'images' and 'context' folders contain directories with matching names.")
         else:
-            ContextApp(img_lst, context_path, context_image_path, max_x, max_y)
             self.imagemenu.entryconfig('Next', state=Tk.DISABLED)
             self.imagemenu.entryconfig('Previous', state=Tk.DISABLED)
             context = ContextApp(img_lst, context_path, context_image_path, max_x, max_y)
