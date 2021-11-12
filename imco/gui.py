@@ -795,10 +795,10 @@ class ContextApp(object):
             bg = DEFAULT_BG)
         self.target_button = Tk.Button(
             self.info_frame,
-            text = 'Go to target image',
+            text = 'Return to target image',
             bg = DEFAULT_BG,
             highlightbackground = DEFAULT_BG,
-            command = self.go_to_target)
+            command = self.open_image)
         self.context_img_canvas = Tk.Canvas(self.root,
             bg=CANVAS_BG,
             highlightthickness=0)
@@ -849,11 +849,6 @@ class ContextApp(object):
             self.open_image()
         else:
             self.info("No more context images in this direction!\n\nReturning to the target image.")
-            self.open_image()
-
-    def go_to_target(self):
-        if self.img_index != self.target_index:
-            self.target_button.pack_forget()
             self.open_image()
 
     def build_fonts(self):
