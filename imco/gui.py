@@ -450,7 +450,6 @@ class ImcoTkApp(object):
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
                     self.selected_image = None
-            self.set_prev_viewed_image()
             self.draw_image()
             self.formatting()
         else:
