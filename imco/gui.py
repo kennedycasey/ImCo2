@@ -304,8 +304,6 @@ class ImcoTkApp(object):
             # results in double events if we also add these bindings.
             self.root.bind('<Left>', self.handle_prev_image)
             self.root.bind('<Right>', self.handle_next_image)
-        self.root.bind(meta_binding('Shift-Left'), self.handle_prev_skipped)
-        self.root.bind(meta_binding('Shift-Right'), self.handle_next_skipped)
         self.root.bind(meta_binding('s'), self.handle_save)
         self.root.bind(meta_binding('e'), self.handle_export)
         self.root.bind(meta_binding('o'), self.handle_open)
@@ -572,22 +570,30 @@ class ImcoTkApp(object):
         self.handle_prev_image()
 
     def handle_prev_skipped(self, event=None):
-        self.set_prev_viewed_image()
         img_lst = self.session.load_images(self.session.dir)
+        skipped = False
         for index in reversed(range(self.session.img_index)):
             if img_lst[index].codes['Skipped'] != None:
                 self.session.img_index = index-1
+                skipped = True
+                self.set_prev_viewed_image()
                 self.handle_next_image_conditional()
                 break
+        if not skipped:
+            self.info("There are no skipped images in this direction.")
 
     def handle_next_skipped(self, event=None):
-        self.set_prev_viewed_image()
         img_lst = self.session.load_images(self.session.dir)
+        skipped = False
         for index in range(self.session.img_index+1, len(img_lst)):
             if img_lst[index].codes['Skipped'] != None:
                 self.session.img_index = index-1
+                skipped = True
+                self.set_prev_viewed_image()
                 self.handle_next_image_conditional()
                 break
+        if not skipped:
+            self.info("There are no skipped images in this direction.")
 
     def open_workdir(self, path):
         try:
