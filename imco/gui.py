@@ -106,12 +106,10 @@ class ImcoTkApp(object):
         self.imagemenu.add_command(
             label='Next Skipped',
             command=self.handle_next_skipped,
-            accelerator=meta_accelerator('Shift-Right'),
             state=Tk.DISABLED)
         self.imagemenu.add_command(
             label='Previous Skipped',
             command=self.handle_prev_skipped,
-            accelerator=meta_accelerator('Shift-Left'),
             state=Tk.DISABLED)
         self.imagemenu.add_command(
             label='Same as previous image',
