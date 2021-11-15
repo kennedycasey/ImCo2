@@ -346,6 +346,7 @@ class ImcoTkApp(object):
                 self.session.img_index = index-1
                 self.handle_next_image_conditional()
                 break
+        self.prev_viewed_img_index -= 1
 
     # Makes list of image paths within 20 of the selected image and adds them to
     # ContextApp for creation of context images interface.
@@ -438,7 +439,6 @@ class ImcoTkApp(object):
     def handle_prev_image(self, event=None):
         if self.session is None:
             return
-        self.set_prev_viewed_image()
         if self.session.prev_image():
             if self.prev_selected_image != None:
                 if self.prev_selected_image == self.selected_image:
