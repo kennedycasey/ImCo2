@@ -7,6 +7,7 @@ class ImcoDb(object):
         self.connection = sqlite3.connect(db_path)
         self.connection.row_factory = sqlite3.Row
         self._ensure_schema(codes)
+        self.dir_list = []
 
     def get(self):
         return self.connection
@@ -26,6 +27,13 @@ class ImcoDb(object):
         q = '''INSERT OR REPLACE INTO `state` (Var, Val) VALUES (?, ?)'''
         curs.executemany(q, ((k, str(v)) for k, v in state.items()))
         conn.commit()
+
+    def get_dir_list(self, dirs):
+        rows = self.iterate_image_rows()
+        self.dir_list = list(set([r['Dir'] for r in rows]))
+        for dir in self.dir_list:
+            if dir not in dirs:
+                raise InvalidDb
 
     def load_image_rows(self, dir_name):
         rows = self.iterate_image_rows(dir_name)
@@ -96,3 +104,6 @@ class ImcoDb(object):
             )'''.format(col_defs)
         curs.execute(q)
         conn.commit()
+
+class InvalidDb(Exception):
+    pass
