@@ -72,14 +72,13 @@ class ImcoTkApp(object):
                 accelerator=meta_accelerator('S'),
                 state=Tk.DISABLED)
         self.filemenu.add_command(
-                label='Export codes to CSV...',
+                label='Export codes to CSV',
                 command=self.handle_export,
                 accelerator=meta_accelerator('E'),
                 state=Tk.DISABLED)
         self.filemenu.add_command(
                 label='Check progress',
                 command=self.handle_check_progress,
-                accelerator=meta_accelerator('P'),
                 state=Tk.DISABLED)
         self.imagemenu = Tk.Menu(self.root)
         self.menubar.add_cascade(label='Image', menu=self.imagemenu)
@@ -92,6 +91,11 @@ class ImcoTkApp(object):
                 label='Next',
                 command=self.handle_next_image,
                 accelerator='Right',
+                state=Tk.DISABLED)
+        self.imagemenu.add_command(
+                label='Same as previous image',
+                command=self.handle_repeated,
+                accelerator=meta_accelerator('.'),
                 state=Tk.DISABLED)
         self.imagemenu.add_command(
                 label='Beginning',
@@ -111,10 +115,6 @@ class ImcoTkApp(object):
             label='Previous Skipped',
             command=self.handle_prev_skipped,
             state=Tk.DISABLED)
-        self.imagemenu.add_command(
-            label='Same as previous image',
-            command=self.handle_repeated,
-            accelerator=meta_accelerator('.'))
         self.entrymenu = Tk.Menu(self.root)
         self.menubar.add_cascade(label='Text Entry', menu=self.entrymenu)
         self.entrymenu.add_command(
@@ -307,7 +307,6 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('o'), self.handle_open)
         self.root.bind(meta_binding('i'), self.handle_open_image)
         self.root.bind(meta_binding('v'), self.handle_open_context)
-        self.root.bind(meta_binding('p'), self.handle_check_progress)
         self.root.bind(meta_binding('l'), self.handle_object_entry)
         self.root.bind(meta_binding('u'), self.handle_comment_entry)
         self.root.bind(meta_binding('Right'), self.handle_frontier)
@@ -609,12 +608,13 @@ class ImcoTkApp(object):
         self.draw_image()
         self.prev_text()
         self.filemenu.entryconfig('Save', state=Tk.NORMAL)
-        self.filemenu.entryconfig('Export codes to CSV...', state=Tk.NORMAL)
+        self.filemenu.entryconfig('Export codes to CSV', state=Tk.NORMAL)
         self.filemenu.entryconfig('Open specific image', state=Tk.NORMAL)
         self.filemenu.entryconfig('View context', state=Tk.NORMAL)
         self.filemenu.entryconfig('Check progress', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
+        self.imagemenu.entryconfig('Same as previous image', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Beginning', state=Tk.NORMAL)
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next Skipped', state=Tk.NORMAL)
