@@ -30,19 +30,19 @@ See below for a table of app functions. Most have associated key commands, and c
 
 | File menu option | Key command | Function |
 | --- | --- | --- |
-| File > Open specific image | ⌘ + I | Open any particular image in the current working directory. Reminder that this image should end with the .gif file extension and should be located in the `images/` subfolder |
+| File > Open specific image | ⌘ + I | Open any particular image in the current working directory |
 | File > View context | ⌘ + V | Automatically pull up 20 images preceding and 20 images following the current target image for context |
-| File > Save | ⌘ + S | Save your current progress. Remember that your codes are stored in the state.db file located in your working directory |
-| File > Export codes to CSV | ⌘ + E | Export your current codes to a .csv file. The file name will automatically be named according to the conventions for this project (i.e., `Directory name_Your initials_Date_Time.csv`). If you have coded multiple image directories in the same working directory, then the exported file will be named `multiple-dirs_Your initials_Date_Time.csv`. You also have the option to rename the file manually |
+| File > Save | ⌘ + S | Save progress |
+| File > Export codes to CSV | ⌘ + E | Export your current state to a csv file |
 | File > Check progress | n/a | Get the number of remaining images to be coded in the current directory |
 | Image > Beginning | ⌘ + &#8592; | Return to the first image in the current directory | 
 | Image > End | ⌘ + &#8594; | Jump to the next image to be coded | 
-| Image > Next Skipped | n/a | Jump to the next skipped image (forwards in time) | 
-| Image > Previous Skipped | n/a | Jump to the previous skipped image (backwards in time) |
+| Image > Next Skipped | n/a | Jump to the next skipped image | 
+| Image > Previous Skipped | n/a | Jump to the previous skipped image |
 | Text entry > Add object name | ⌘ + L | Pull up text entry box to add object name(s) | 
 | Text entry > Add comment | ⌘ + U | Pull up text entry box to add comment(s) |
 
 ## Attribution
 If you use IMCO (version 2), please cite one of the following:
 
-Casillas, M., Casey, K., Fisher, W., & Tice, Shawn C. (2021). ImCo: A Python Tkinter application for coding _lots_ of images [Computer software; version 2]. Retrieved from https://github.com/kennedycasey/ImCo2.
+Casillas, M., Casey, K., Fisher, W., & Tice, Shawn C. (2021). ImCo: A Python Tkinter application for coding _lots_ of images, version 2 [Computer software]. Retrieved from https://github.com/kennedycasey/ImCo2.
