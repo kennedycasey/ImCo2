@@ -98,6 +98,10 @@ class ImcoTkApp(object):
                 accelerator=meta_accelerator('.'),
                 state=Tk.DISABLED)
         self.imagemenu.add_command(
+                label = 'Multiple images',
+                command = self.handle_multiple_objects,
+                accelerator=meta_accelerator('='))
+        self.imagemenu.add_command(
                 label='Beginning',
                 command = self.handle_first,
                 accelerator = meta_accelerator('Left'),
@@ -312,6 +316,16 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('Right'), self.handle_frontier)
         self.root.bind(meta_binding('Left'), self.handle_first)
         self.root.bind(meta_binding('.'), self.handle_repeated)
+        self.root.bind(meta_binding('='), self.handle_multiple_objects)
+
+    def handle_multiple_objects(self, event=None):
+        self.number_objects = simpledialog.askstring(
+                title="Multiple objects",
+                prompt="How many objects are in the image",
+                parent=self.root)
+        
+
+
 
     def handle_open(self, event=None):
         path = tkinter.filedialog.askdirectory(
@@ -571,10 +585,11 @@ class ImcoTkApp(object):
         skipped = False
         for index in reversed(range(self.session.img_index)):
             if img_lst[index].codes['Skipped'] != None:
+                self.prev_index = self.session.img_index
                 self.session.img_index = index-1
                 skipped = True
-                self.set_prev_viewed_image()
                 self.handle_next_image_conditional()
+                self.prev_viewed_img_index = self.prev_index
                 break
         if not skipped:
             self.info("There are no skipped images in this direction.")
@@ -584,10 +599,11 @@ class ImcoTkApp(object):
         skipped = False
         for index in range(self.session.img_index+1, len(img_lst)):
             if img_lst[index].codes['Skipped'] != None:
+                self.prev_index = self.session.img_index
                 self.session.img_index = index-1
                 skipped = True
-                self.set_prev_viewed_image()
                 self.handle_next_image_conditional()
+                self.prev_img_index = self.prev_index
                 break
         if not skipped:
             self.info("There are no skipped images in this direction.")
