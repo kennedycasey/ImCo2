@@ -10,9 +10,10 @@ import sys
 import re
 import glob
 import datetime
+import shutil
 
 from imco.version import VERSION
-from imco.session import ImcoSession
+from imco.session import ImcoSession, ImcoImage
 import imco
 
 
@@ -98,7 +99,7 @@ class ImcoTkApp(object):
                 accelerator=meta_accelerator('.'),
                 state=Tk.DISABLED)
         self.imagemenu.add_command(
-                label = 'Multiple images',
+                label = 'Multiple objects',
                 command = self.handle_multiple_objects,
                 accelerator=meta_accelerator('='))
         self.imagemenu.add_command(
@@ -321,10 +322,15 @@ class ImcoTkApp(object):
     def handle_multiple_objects(self, event=None):
         self.number_objects = simpledialog.askstring(
                 title="Multiple objects",
-                prompt="How many objects are in the image",
+                prompt="How many objects are in the image?",
                 parent=self.root)
-        
-
+        n = int(self.number_objects)
+        for i in range(n-1):
+            orig = self.session.img.path
+            target = self.session.img.path[:-4] + '_d'+str(i) + '.gif'
+            path=shutil.copy(orig, target)
+            img = ImcoImage(path, self.session.config.codes)
+            self.session.dir.images.insert(self.session.img_index+1, img)
 
 
     def handle_open(self, event=None):
