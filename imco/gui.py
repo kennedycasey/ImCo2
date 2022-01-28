@@ -266,6 +266,13 @@ class ImcoTkApp(object):
             highlightbackground = DEFAULT_BG,
             command = self.handle_remove_comment_entry
         )
+        self.multiple_undo_button = Tk.Button(
+            self.info_frame,
+            text = 'Undo multiple objects',
+            bg = DEFAULT_BG,
+            highlightbackground = DEFAULT_BG,
+            command = self.handle_undo_multiple
+        )
         self.img_canvas = Tk.Canvas(
                 self.root,
                 bg=CANVAS_BG,
@@ -325,13 +332,24 @@ class ImcoTkApp(object):
                 prompt="How many objects are in the image?",
                 parent=self.root)
         n = int(self.number_objects)
+        self.session.img.objectcount=n
         for i in range(n-1):
             orig = self.session.img.path
             target = self.session.img.path[:-4] + '_d'+str(i) + '.gif'
             path=shutil.copy(orig, target)
             img = ImcoImage(path, self.session.config.codes)
+            img.objectcount=n
             self.session.dir.images.insert(self.session.img_index+1, img)
+        self.info("You indicated that there were " + str(n) + " objects in this image. Code them one at a time.")
+        self.multiple_undo_button.pack()
 
+    def handle_undo_multiple(self, event=None):
+        for i in reversed(range(self.session.img.objectcount-1)):
+            del self.session.dir.images[self.session.img_index+i+1]
+            img = self.session.img.path[:-4] + '_d' + str(i) + '.gif'
+            os.remove(img)
+        self.session.img.objectcount=1
+        self.multiple_undo_button.pack_forget()
 
     def handle_open(self, event=None):
         path = tkinter.filedialog.askdirectory(
@@ -497,6 +515,10 @@ class ImcoTkApp(object):
             self.session.update_frontier()
         self.object_undo_button.pack_forget()
         self.comment_undo_button.pack_forget()
+        if self.session.img.objectcount > 1 and '_d' not in self.session.img.path:
+            self.multiple_undo_button.pack()
+        else:
+            self.multiple_undo_button.pack_forget()
         try:
             self.object_name.pack_forget()
         except AttributeError:
