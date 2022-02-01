@@ -45,4 +45,4 @@ See below for a table of app functions. Most have associated key commands, and c
 ## Attribution
 If you use IMCO (version 2), please cite one of the following:
 
-Casillas, M., Casey, K., Fisher, W., & Tice, S. C. (2021). ImCo: A Python Tkinter application for coding _lots_ of images, version 2 [Computer software]. Retrieved from https://github.com/kennedycasey/ImCo2.
+Casey, K., Fisher, W., Tice, S. C., & Casillas, M. (2022). ImCo: A Python Tkinter application for coding _lots_ of images, version 2.0 [Computer software]. Retrieved from https://github.com/kennedycasey/ImCo2.
