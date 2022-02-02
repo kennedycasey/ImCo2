@@ -345,10 +345,13 @@ class ImcoTkApp(object):
 
     def handle_undo_multiple(self, event=None):
         for i in reversed(range(self.session.img.objectcount-1)):
+            name = self.session.dir.images[self.session.img_index+i+1].name
+            self.session.db.delete_duplicate(name)
             del self.session.dir.images[self.session.img_index+i+1]
             img = self.session.img.path[:-4] + '_d' + str(i) + '.gif'
             os.remove(img)
         self.session.img.objectcount=1
+        self.session.modified_images[self.session.img.path]=self.session.img
         self.multiple_undo_button.pack_forget()
 
     def handle_open(self, event=None):

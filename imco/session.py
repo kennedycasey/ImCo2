@@ -109,6 +109,8 @@ class ImcoSession(object):
 
     def code_image(self, code, value):
         self.img.code(code, value)
+        if self.img.codes['None'] != None:
+            self.img.objectcount=0
         if self.img.is_coded(self.config.codes):
             self.modified_images[self.img.path] = self.img
 
@@ -146,6 +148,9 @@ class ImcoSession(object):
             row = [coder] + list(row)
             writer.writerow(row)
 
+    def delete_duplicates(self, name):
+        self.db.delete_duplicate(name)
+
 class ImcoDir(object):
 
     def __init__(self, path, session):
@@ -173,6 +178,7 @@ class ImcoImage(object):
         self._comments = ''
         self._object_name = ''
         self._repeated = {}
+        self._objectcount = 1
 
     @property
     def timestamp(self):
@@ -200,6 +206,14 @@ class ImcoImage(object):
     def object_name(self, object_name):
         self._object_name = object_name
         self._modified = datetime.datetime.now()
+
+    @property
+    def objectcount(self):
+        return self._objectcount
+
+    @objectcount.setter
+    def objectcount(self, objectcount):
+        self._objectcount = objectcount
 
     @property
     def comments(self):

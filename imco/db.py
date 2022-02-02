@@ -64,18 +64,26 @@ class ImcoDb(object):
                 curs.execute('ALTER TABLE `codes` ADD COLUMN Comments')
         conn.commit()
 
+    def delete_duplicate(self, name):
+        conn = self.get()
+        curs = conn.cursor()
+        q = 'DELETE FROM codes WHERE Image=?;'
+        curs.execute(q, (name,))
+        conn.commit()
+
+
     def store_image_rows(self, images, codes):
         conn = self.get()
         curs = conn.cursor()
         code_columns = [c.code for c in codes]
         columns_str = ', '.join(code_columns)
-        qmarks = ', '.join(['?'] * (5 + len(code_columns)))
-        q = '''INSERT OR REPLACE INTO `codes` (Dir, Image, Modified, Object, Comments, {})
+        qmarks = ', '.join(['?'] * (6 + len(code_columns)))
+        q = '''INSERT OR REPLACE INTO `codes` (Dir, Image, Modified, Object, Comments, ObjectCount, {})
                VALUES ({})'''.format(columns_str, qmarks)
         values = []
         for img in images:
             code_values = [c.to_db(img.codes[c.code]) for c in codes]
-            v = tuple([img.dir, img.name, img.timestamp, img.object_name, img.comments] + code_values)
+            v = tuple([img.dir, img.name, img.timestamp, img.object_name, img.comments, img.objectcount] + code_values)
             values.append(v)
         curs.executemany(q, values)
         conn.commit()
@@ -99,6 +107,7 @@ class ImcoDb(object):
                 Modified TEXT CURRENT_TIMESTAMP,
                 Object TEXT,
                 Comments TEXT,
+                ObjectCount SMALLINT,
                 {},
                 PRIMARY KEY (Dir, Image)
             )'''.format(col_defs)
