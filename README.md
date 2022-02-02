@@ -43,6 +43,6 @@ See below for a table of app functions. Most have associated key commands, and c
 | Text entry > Add comment | ⌘ + U | Pull up text entry box to add comment(s) |
 
 ## Attribution
-If you use IMCO (version 2), please cite one of the following:
+If you use IMCO, please cite the following:
 
 Casey, K., Fisher, W., Tice, S. C., & Casillas, M. (2022). ImCo: A Python Tkinter application for coding _lots_ of images, version 2.0 [Computer software]. Retrieved from https://github.com/kennedycasey/ImCo2.
