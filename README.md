@@ -39,6 +39,8 @@ See below for a table of app functions. Most have associated key commands, and c
 | Image > End | ⌘ + &#8594; | Jump to the next image to be coded | 
 | Image > Next Skipped | n/a | Jump to the next skipped image | 
 | Image > Previous Skipped | n/a | Jump to the previous skipped image |
+| Image > Same as previous image | ⌘ + . | Code current image the same as the previous image |
+| Image > Multiple objects | ⌘ + = | Duplicate images to code multiple objects separately | 
 | Text entry > Add object name | ⌘ + L | Pull up text entry box to add object name(s) | 
 | Text entry > Add comment | ⌘ + U | Pull up text entry box to add comment(s) |
 
