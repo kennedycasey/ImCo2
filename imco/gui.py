@@ -11,6 +11,7 @@ import re
 import glob
 import datetime
 import shutil
+from PIL import ImageTk, Image
 
 from imco.version import VERSION
 from imco.session import ImcoSession, ImcoImage
@@ -148,7 +149,8 @@ class ImcoTkApp(object):
                 self.info_frame,
                 text = "Your object name(s): " + self.object_entry,
                 fg = '#05976c',
-                bg = '#f6f6f6')
+                bg = '#f6f6f6',
+                wraplength=375)
             self.object_name.pack(fill=Tk.X)
             self.object_undo_button.pack()
             self.session.set_image_object_name(self.object_entry)
@@ -179,7 +181,8 @@ class ImcoTkApp(object):
                 self.info_frame,
                 text = "Your comments: " + self.comment_entry,
                 fg = '#05976c',
-                bg = '#f6f6f6')
+                bg = '#f6f6f6',
+                wraplength=375)
             self.comments.pack(fill=Tk.X)
             self.comment_undo_button.pack()
             self.session.set_image_comments(self.comment_entry)
@@ -474,6 +477,18 @@ class ImcoTkApp(object):
             self.session.set_image_object_name(self.session.dir._images[self.session.img_index-1].object_name)
             self.prev_text()
 
+    def handle_find_replace(self, event=None):
+        self.find_replace = simpledialog.askstring(
+                title="Find and Replace",
+                prompt="Enter the object name you would like to change and then the name you would like to replace it with, separated by a comma",
+                parent=self.root)
+        old_name = self.find_replace.split(',')[0]
+        new_name = self.find_replace.split(',')[1]
+        for img in self.session.dir.images:
+            if img.object_name == old_name:
+                img.object_name = new_name
+        
+
     def handle_prev_image(self, event=None):
         if self.session is None:
             return
@@ -674,10 +689,12 @@ class ImcoTkApp(object):
 
     def draw_image(self):
         if self.selected_image is not None and len(self.selected_image)>0:
-            self.photo_img = Tk.PhotoImage(file=self.selected_image)
-            x = self.session.config.image_max_x / 2 - 1
-            y = self.session.config.image_max_y / 2.42 - 1
-            self.img_canvas.create_image(x, y, image=self.photo_img)
+            image = Image.open(self.session.img.path)
+            image=image.resize((950, 750), Image.ANTIALIAS)
+            self.photo_img = ImageTk.PhotoImage(image)
+            #x = self.session.config.image_max_x / 2 - 1
+            #y = self.session.config.image_max_y / 2.42 - 1
+            self.img_canvas.create_image(499, 412, image=self.photo_img)
             self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
             for code_label in self.code_labels:
@@ -686,10 +703,12 @@ class ImcoTkApp(object):
         else:
             if self.photo_img is not None:
                 self.img_canvas.delete(self.photo_img)
-            self.photo_img = Tk.PhotoImage(file=self.session.img.path)
-            x = self.session.config.image_max_x / 2 - 1
-            y = self.session.config.image_max_y / 2.42 - 1
-            self.img_canvas.create_image(x, y, image=self.photo_img)
+            image = Image.open(self.session.img.path)
+            image=image.resize((950, 750), Image.ANTIALIAS)
+            self.photo_img = ImageTk.PhotoImage(image)
+            #x = self.session.config.image_max_x / 2 - 1
+            #y = self.session.config.image_max_y / 2.42 - 1
+            self.img_canvas.create_image(499, 412, image=self.photo_img)
             self.path_label.config(text=self.session.img_path)
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
             for code_label in self.code_labels:
