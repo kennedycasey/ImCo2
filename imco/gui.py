@@ -717,8 +717,6 @@ class ImcoTkApp(object):
             image = Image.open(self.session.img.path)
             image=image.resize((950, 750), Image.ANTIALIAS)
             self.photo_img = ImageTk.PhotoImage(image)
-            #x = self.session.config.image_max_x / 2 - 1
-            #y = self.session.config.image_max_y / 2.42 - 1
             self.img_canvas.create_image(499, 412, image=self.photo_img)
             self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
@@ -732,8 +730,6 @@ class ImcoTkApp(object):
             image = Image.open(self.session.img.path)
             image=image.resize((950, 750), Image.ANTIALIAS)
             self.photo_img = ImageTk.PhotoImage(image)
-            #x = self.session.config.image_max_x / 2 - 1
-            #y = self.session.config.image_max_y / 2.42 - 1
             self.img_canvas.create_image(499, 412, image=self.photo_img)
             self.path_label.config(text=self.session.img_path)
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
