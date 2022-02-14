@@ -375,6 +375,7 @@ class ImcoTkApp(object):
             self.info("You indicated that there are " + str(n) + " objects in this image. Code them one at a time.")
             self.multiple_undo_button.pack()
             self.object_count_label.config(text = str(self.session.img.objectcount))
+            self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
     def handle_undo_multiple(self, event=None):
         for i in reversed(range(self.session.img.objectcount-1)):
@@ -387,6 +388,7 @@ class ImcoTkApp(object):
         self.session.modified_images[self.session.img.path]=self.session.img
         self.multiple_undo_button.pack_forget()
         self.object_count_label.config(text = str(self.session.img.objectcount))
+        self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
     def handle_open(self, event=None):
         path = tkinter.filedialog.askdirectory(
@@ -576,7 +578,7 @@ class ImcoTkApp(object):
             self.session.update_frontier()
         self.object_undo_button.pack_forget()
         self.comment_undo_button.pack_forget()
-        if self.session.img.objectcount > 1 and '_d' not in self.session.img.path:
+        if self.session.img.objectcount > 1:
             self.multiple_undo_button.pack()
         else:
             self.multiple_undo_button.pack_forget()
