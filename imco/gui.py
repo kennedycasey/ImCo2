@@ -511,12 +511,16 @@ class ImcoTkApp(object):
             self.prev_text()
 
     def handle_find_replace(self, event=None):
-        self.find_replace = simpledialog.askstring(
-                title="Find and Replace",
-                prompt="Enter the object name you would like to change and then the name you would like to replace it with, separated by a comma",
+        self.find = simpledialog.askstring(
+                title="FIND",
+                prompt="Enter the object name you want to find",
                 parent=self.root)
-        old_name = self.find_replace.split(',')[0]
-        new_name = self.find_replace.split(',')[1]
+        self.replace = simpledialog.askstring(
+                title="REPLACE",
+                prompt="Enter the object name to replace: " + self.find.upper(),
+                parent=self.root)
+        old_name = self.find
+        new_name = self.replace
         for img in self.session.dir.images:
             if img.object_name == old_name:
                 img.object_name = new_name
