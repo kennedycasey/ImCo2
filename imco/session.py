@@ -193,6 +193,7 @@ class ImcoImage(object):
                 self.codes[code.code] = code.from_db(db_value)
         self._comments = row['Comments']
         self._object_name = row['Object']
+        self.objectcount = row['ObjectCount']
 
     def code(self, code, value):
         self.codes[code.code] = value
