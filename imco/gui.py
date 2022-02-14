@@ -234,6 +234,21 @@ class ImcoTkApp(object):
                 justify=Tk.LEFT,
                 bg=DEFAULT_BG)
         self.order_label.pack(fill=Tk.X)
+        self.object_count_section_label = Tk.Label(
+                self.info_frame,
+                anchor=Tk.W,
+                justify=Tk.LEFT,
+                font=self.section_font,
+                fg=SECTION_FG,
+                bg=DEFAULT_BG,
+                text='OBJECT COUNT')
+        self.object_count_section_label.pack(fill=Tk.X, pady=(10, 0))
+        self.object_count_label = Tk.Label(
+            self.info_frame,
+                anchor=Tk.W,
+                justify=Tk.LEFT,
+                bg=DEFAULT_BG)
+        self.object_count_label.pack(fill=Tk.X)
         self.codes_section_label = Tk.Label(
                 self.info_frame,
                 anchor=Tk.W,
@@ -346,24 +361,26 @@ class ImcoTkApp(object):
             self.session.img.objectcount = n
             for i in range(n - 1):
                 orig = self.session.img.path
-                target = self.session.img.path[:-4] + '_' + str(i + 1) + '.gif'
+                target = self.session.img.path[:-4] + '_d' + str(i + 1) + '.gif'
                 path=shutil.copy(orig, target)
                 img = ImcoImage(path, self.session.config.codes)
                 img.objectcount = n
                 self.session.dir.images.insert(self.session.img_index + 1, img)
             self.info("You indicated that there are " + str(n) + " objects in this image. Code them one at a time.")
             self.multiple_undo_button.pack()
+            self.object_count_label.config(text = str(self.session.img.objectcount))
 
     def handle_undo_multiple(self, event=None):
         for i in reversed(range(self.session.img.objectcount-1)):
             name = self.session.dir.images[self.session.img_index+i+1].name
             self.session.db.delete_duplicate(name)
             del self.session.dir.images[self.session.img_index+i+1]
-            img = self.session.img.path[:-4] + '_d' + str(i) + '.gif'
+            img = self.session.img.path[:-4] + '_d' + str(i + 1) + '.gif'
             os.remove(img)
         self.session.img.objectcount=1
         self.session.modified_images[self.session.img.path]=self.session.img
         self.multiple_undo_button.pack_forget()
+        self.object_count_label.config(text = str(self.session.img.objectcount))
 
     def handle_open(self, event=None):
         path = tkinter.filedialog.askdirectory(
@@ -705,6 +722,7 @@ class ImcoTkApp(object):
             self.img_canvas.create_image(499, 412, image=self.photo_img)
             self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
+            self.object_count_label.config(text = str(self.session.img.objectcount))
             for code_label in self.code_labels:
                 code_label.set_from_image(self.session.img)
             self.prev_selected_image = self.selected_image
@@ -719,6 +737,7 @@ class ImcoTkApp(object):
             self.img_canvas.create_image(499, 412, image=self.photo_img)
             self.path_label.config(text=self.session.img_path)
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
+            self.object_count_label.config(text = str(self.session.img.objectcount))
             for code_label in self.code_labels:
                 code_label.set_from_image(self.session.img)
 
