@@ -522,21 +522,21 @@ class ImcoTkApp(object):
         old_name = self.find
         new_name = self.replace
         for img in self.session.dir.images:
-            if img.object_name == old_name:
-                img.object_name = new_name
+            if img.object_name.find(old_name) != -1:
+                img.object_name = img.object_name.replace(old_name, new_name)
                 self.session.modified_images[img.path] = img
-        if self.session.img.object_name == new_name:
+                self.session.save()  
+        if self.session.img.object_name.find(new_name) != -1:
             self.object_name.pack_forget()
             self.object_undo_button.pack_forget()
             self.object_name = Tk.Label(
                 self.info_frame,
-                text = "Your object name(s): " + new_name,
+                text = "Your object name(s): " + self.session.img.object_name,
                 fg = '#05976c',
                 bg = '#f6f6f6',
                 wraplength=375)
             self.object_name.pack(fill=Tk.X)
             self.object_undo_button.pack()
-            self.session.save()
         
     def handle_prev_image(self, event=None):
         if self.session is None:
