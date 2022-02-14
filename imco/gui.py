@@ -378,11 +378,20 @@ class ImcoTkApp(object):
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
     def handle_undo_multiple(self, event=None):
-        for i in reversed(range(self.session.img.objectcount-1)):
-            name = self.session.dir.images[self.session.img_index+i+1].name
+        if '_d' in self.session.img.name:
+            orig_path = self.session.img.path[:-7]+self.session.img.path[-4:]
+            orig_index = self.session.img_index - (self.session.img.objectcount-int(self.session.img.path[-5]))
+        else:
+            orig_path = self.session.img.path
+            orig_index = self.session.img_index
+        objectcount = self.session.img.objectcount
+        self.session.img_index = orig_index - 1
+        self.handle_next_image_conditional()
+        for i in reversed(range(objectcount-1)):
+            name = self.session.dir.images[orig_index+1].name
             self.session.db.delete_duplicate(name)
-            del self.session.dir.images[self.session.img_index+i+1]
-            img = self.session.img.path[:-4] + '_d' + str(i + 1) + '.gif'
+            del self.session.dir.images[orig_index+1]
+            img = orig_path[:-4] + '_d' + str(i + 1) + '.gif'
             os.remove(img)
         self.session.img.objectcount=1
         self.session.modified_images[self.session.img.path]=self.session.img
