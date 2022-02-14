@@ -334,17 +334,25 @@ class ImcoTkApp(object):
                 title="Multiple objects",
                 prompt="How many objects are in the image?",
                 parent=self.root)
-        n = int(self.number_objects)
-        self.session.img.objectcount=n
-        for i in range(n-1):
-            orig = self.session.img.path
-            target = self.session.img.path[:-4] + '_d'+str(i) + '.gif'
-            path=shutil.copy(orig, target)
-            img = ImcoImage(path, self.session.config.codes)
-            img.objectcount=n
-            self.session.dir.images.insert(self.session.img_index+1, img)
-        self.info("You indicated that there were " + str(n) + " objects in this image. Code them one at a time.")
-        self.multiple_undo_button.pack()
+
+        if (self.number_objects is None or len(self.number_objects) == 0):
+            pass
+
+        elif (self.number_objects == "1"):
+            self.info("Whoops! You indicated that there is only one object in this image. If multiple objects are present, re-enter the correct number.")
+    
+        else:
+            n = int(self.number_objects)
+            self.session.img.objectcount = n
+            for i in range(n - 1):
+                orig = self.session.img.path
+                target = self.session.img.path[:-4] + '_' + str(i + 1) + '.gif'
+                path=shutil.copy(orig, target)
+                img = ImcoImage(path, self.session.config.codes)
+                img.objectcount = n
+                self.session.dir.images.insert(self.session.img_index + 1, img)
+            self.info("You indicated that there are " + str(n) + " objects in this image. Code them one at a time.")
+            self.multiple_undo_button.pack()
 
     def handle_undo_multiple(self, event=None):
         for i in reversed(range(self.session.img.objectcount-1)):
