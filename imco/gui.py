@@ -133,6 +133,11 @@ class ImcoTkApp(object):
             command=self.handle_comment_entry,
             accelerator=meta_accelerator('U'),
             state=Tk.DISABLED)
+        self.entrymenu.add_command(
+            label='Find and replace object',
+            command=self.handle_comment_entry,
+            accelerator=meta_accelerator('R'),
+            state=Tk.DISABLED)
         self.root.config(menu=self.menubar)
 
     def handle_object_entry(self, event=None):
@@ -339,6 +344,7 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('v'), self.handle_open_context)
         self.root.bind(meta_binding('l'), self.handle_object_entry)
         self.root.bind(meta_binding('u'), self.handle_comment_entry)
+        self.root.bind(meta_binding('r'), self.handle_find_replace)
         self.root.bind(meta_binding('Right'), self.handle_frontier)
         self.root.bind(meta_binding('Left'), self.handle_first)
         self.root.bind(meta_binding('.'), self.handle_repeated)
@@ -512,8 +518,20 @@ class ImcoTkApp(object):
         for img in self.session.dir.images:
             if img.object_name == old_name:
                 img.object_name = new_name
+                self.session.modified_images[img.path] = img
+        if self.session.img.object_name == new_name:
+            self.object_name.pack_forget()
+            self.object_undo_button.pack_forget()
+            self.object_name = Tk.Label(
+                self.info_frame,
+                text = "Your object name(s): " + new_name,
+                fg = '#05976c',
+                bg = '#f6f6f6',
+                wraplength=375)
+            self.object_name.pack(fill=Tk.X)
+            self.object_undo_button.pack()
+            self.session.save()
         
-
     def handle_prev_image(self, event=None):
         if self.session is None:
             return
@@ -708,6 +726,7 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Previous Skipped', state=Tk.NORMAL)
         self.entrymenu.entryconfig('Add object name', state=Tk.NORMAL)
         self.entrymenu.entryconfig('Add comment', state=Tk.NORMAL)
+        self.entrymenu.entryconfig('Find and replace object', state=Tk.NORMAL)
 
     def set_prev_viewed_image(self):
         self.prev_viewed_img_index = self.session.img_index
