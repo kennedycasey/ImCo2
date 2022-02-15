@@ -2,12 +2,12 @@
 
 A Python Tkinter application for coding _lots_ of images.
 
-IMCO ("IMage COder") is a Python-based application for efficiently annotating image directories with pre-defined, categorical values. Version 1 is available [here](https://github.com/marisacasillas/ImCo). The app as provided is set up for annotating child-centric daylong image streams, but the input values can be edited to fit your custom needs. The current version (version 2) introduces a few new features -- most notably, an option for including text entries in addition to pre-defined categories and an option to view context images.
+IMCO ("IMage COder") is a Python-based application for efficiently annotating image directories with pre-defined, categorical values. Version 1 is available [here](https://github.com/marisacasillas/ImCo). The app as provided is set up for annotating child-centric daylong image streams, but the input values can be edited to fit your custom needs. The current version (version 2) introduces a few new features---most notably, an option for including text entries in addition to pre-defined categories and an option to view context images.
 
 ## Running IMCO
 Launch the application by running `app.py` in the imco directory (make sure the file is executable with Python 3 on your machine, e.g., `chmod +x app.py` for OSX with Python 3 installed).
 
-When ImCo first runs, you'll need to open a your working directory (File > Open or cmd + o). This directory should contain a configuration .json file and a subdirectory called "images" that itself contains directories of images to code. The ImCo app will save your annotation data in a file called state.db that it creates in your working directory.
+When IMCO first runs, you'll need to open a your working directory (File > Open or ⌘ + O). This directory should contain a configuration .json file and a subdirectory called "images" that itself contains directories of images to code. The IMCO app will save your annotation data in a file called state.db that it creates in your working directory.
 
 The structure of the working directory is as follows:
 
@@ -43,6 +43,7 @@ See below for a table of app functions. Most have associated key commands, and c
 | Image > Multiple objects | ⌘ + = | Duplicate images to code multiple objects separately | 
 | Text entry > Add object name | ⌘ + L | Pull up text entry box to add object name(s) | 
 | Text entry > Add comment | ⌘ + U | Pull up text entry box to add comment(s) |
+| Text entry > Find and replace object name | ⌘ + R | Relabel objects within the current directory |
 
 ## Attribution
 If you use IMCO, please cite the following:
