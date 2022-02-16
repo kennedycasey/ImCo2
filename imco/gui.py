@@ -135,7 +135,7 @@ class ImcoTkApp(object):
             state=Tk.DISABLED)
         self.entrymenu.add_command(
             label='Find and replace object',
-            command=self.handle_comment_entry,
+            command=self.handle_find_replace,
             accelerator=meta_accelerator('R'),
             state=Tk.DISABLED)
         self.root.config(menu=self.menubar)
@@ -548,6 +548,11 @@ class ImcoTkApp(object):
             self.object_undo_button.pack()
         
     def handle_prev_image(self, event=None):
+        if self.session.img.is_coded(self.session.config.codes):
+            if self.session.img.codes['None'] is not None:
+                self.session.set_image_object_count(0)
+            elif self.session.img.codes['None'] is None and self.session.img.object_count <=1:
+                self.session.set_image_object_count(1)
         if self.session is None:
             return
         if self.session.prev_image():
@@ -573,7 +578,8 @@ class ImcoTkApp(object):
                 self.info_frame,
                 text = "Your object name(s): " + self.session.img.object_name,
                 fg = '#05976c',
-                bg = '#f6f6f6')
+                bg = '#f6f6f6',
+                wraplength=375)
             self.object_name.pack(fill=Tk.X)
             self.object_undo_button.pack()
 
@@ -582,7 +588,8 @@ class ImcoTkApp(object):
                 self.info_frame,
                 text = "Your comments: " + self.session.img.comments,
                 fg = '#05976c',
-                bg = '#f6f6f6')
+                bg = '#f6f6f6',
+                wraplength=375)
             self.comments.pack(fill=Tk.X)
             self.comment_undo_button.pack()
 
@@ -606,6 +613,10 @@ class ImcoTkApp(object):
         self.prev_text()
 
     def handle_next_image(self, event=None):
+        if self.session.img.codes['None'] is not None:
+            self.session.set_image_object_count(0)
+        elif self.session.img.codes['None'] is None and self.session.img.object_count <=1:
+            self.session.set_image_object_count(1)
         if self.session is None:
             return
         if not self.session.img_coded():
@@ -642,6 +653,11 @@ class ImcoTkApp(object):
             self.formatting()
 
     def handle_next_image_conditional(self, event=None):
+        if self.session.img.is_coded(self.session.config.codes):
+            if self.session.img.codes['None'] is not None:
+                self.session.set_image_object_count(0)
+            elif self.session.img.codes['None'] is None and self.session.img.object_count <=1:
+                self.session.set_image_object_count(1)
         if self.session is None:
             return
         update_image = False
