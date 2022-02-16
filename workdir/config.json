@@ -1,6 +1,11 @@
 {
   "codes": [
       {
+          "code": "OutofFrame",
+          "label": "Object out of frame",
+          "key": "O"
+      },
+      {
           "code": "StudyRelated",
           "label": "Study-related object",
           "key": "X"
