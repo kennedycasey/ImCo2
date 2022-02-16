@@ -83,7 +83,7 @@ class ImcoDb(object):
         values = []
         for img in images:
             code_values = [c.to_db(img.codes[c.code]) for c in codes]
-            v = tuple([img.dir, img.name, img.timestamp, img.object_name, img.comments, img.objectcount] + code_values)
+            v = tuple([img.dir, img.name, img.timestamp, img.object_name, img.comments, img.object_count] + code_values)
             values.append(v)
         curs.executemany(q, values)
         conn.commit()

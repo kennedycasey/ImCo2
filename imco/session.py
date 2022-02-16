@@ -109,10 +109,15 @@ class ImcoSession(object):
 
     def code_image(self, code, value):
         self.img.code(code, value)
-        if self.img.codes['None'] != None:
-            self.img.objectcount=0
         if self.img.is_coded(self.config.codes):
             self.modified_images[self.img.path] = self.img
+
+    def set_image_object_count(self, object_count):
+        if self.img.codes['None'] is not None:
+            self.img.object_count = 0
+        else: 
+            self.img.object_count = object_count
+        self.modified_images[self.img.path] = self.img
 
     def set_image_object_name(self, object_name):
         self.img.object_name = object_name
@@ -178,7 +183,7 @@ class ImcoImage(object):
         self._comments = ''
         self._object_name = ''
         self._repeated = {}
-        self._objectcount = 1
+        self._object_count = 1
 
     @property
     def timestamp(self):
@@ -193,7 +198,7 @@ class ImcoImage(object):
                 self.codes[code.code] = code.from_db(db_value)
         self._comments = row['Comments']
         self._object_name = row['Object']
-        self.objectcount = row['ObjectCount']
+        self.object_count = row['ObjectCount']
 
     def code(self, code, value):
         self.codes[code.code] = value
@@ -209,12 +214,12 @@ class ImcoImage(object):
         self._modified = datetime.datetime.now()
 
     @property
-    def objectcount(self):
-        return self._objectcount
+    def object_count(self):
+        return self._object_count
 
-    @objectcount.setter
-    def objectcount(self, objectcount):
-        self._objectcount = objectcount
+    @object_count.setter
+    def object_count(self, object_count):
+        self._object_count = object_count
 
     @property
     def comments(self):

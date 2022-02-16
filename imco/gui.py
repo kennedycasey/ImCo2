@@ -364,39 +364,39 @@ class ImcoTkApp(object):
     
         else:
             n = int(self.number_objects)
-            self.session.img.objectcount = n
+            self.session.set_image_object_count(n)
             for i in range(n - 1):
                 orig = self.session.img.path
                 target = self.session.img.path[:-4] + '_d' + str(i + 1) + '.gif'
-                path=shutil.copy(orig, target)
+                path = shutil.copy(orig, target)
                 img = ImcoImage(path, self.session.config.codes)
-                img.objectcount = n
+                img.object_count = n
                 self.session.dir.images.insert(self.session.img_index + 1, img)
             self.info("You indicated that there are " + str(n) + " objects in this image. Code them one at a time.")
             self.multiple_undo_button.pack()
-            self.object_count_label.config(text = str(self.session.img.objectcount))
+            self.object_count_label.config(text = str(self.session.img.object_count))
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
     def handle_undo_multiple(self, event=None):
         if '_d' in self.session.img.name:
             orig_path = self.session.img.path[:-7]+self.session.img.path[-4:]
-            orig_index = self.session.img_index - (self.session.img.objectcount-int(self.session.img.path[-5]))
+            orig_index = self.session.img_index - (self.session.img.object_count-int(self.session.img.path[-5]))
         else:
             orig_path = self.session.img.path
             orig_index = self.session.img_index
-        objectcount = self.session.img.objectcount
+        object_count = self.session.img.object_count
         self.session.img_index = orig_index - 1
         self.handle_next_image_conditional()
-        for i in reversed(range(objectcount-1)):
+        for i in reversed(range(object_count-1)):
             name = self.session.dir.images[orig_index+1].name
             self.session.db.delete_duplicate(name)
             del self.session.dir.images[orig_index+1]
             img = orig_path[:-4] + '_d' + str(i + 1) + '.gif'
             os.remove(img)
-        self.session.img.objectcount=1
+        self.session.img.object_count=1
         self.session.modified_images[self.session.img.path]=self.session.img
         self.multiple_undo_button.pack_forget()
-        self.object_count_label.config(text = str(self.session.img.objectcount))
+        self.object_count_label.config(text = str(self.session.img.object_count))
         self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
     def handle_open(self, event=None):
@@ -591,7 +591,7 @@ class ImcoTkApp(object):
             self.session.update_frontier()
         self.object_undo_button.pack_forget()
         self.comment_undo_button.pack_forget()
-        if self.session.img.objectcount > 1:
+        if self.session.img.object_count > 1:
             self.multiple_undo_button.pack()
         else:
             self.multiple_undo_button.pack_forget()
@@ -754,7 +754,7 @@ class ImcoTkApp(object):
             self.img_canvas.create_image(499, 412, image=self.photo_img)
             self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
-            self.object_count_label.config(text = str(self.session.img.objectcount))
+            self.object_count_label.config(text = str(self.session.img.object_count))
             for code_label in self.code_labels:
                 code_label.set_from_image(self.session.img)
             self.prev_selected_image = self.selected_image
@@ -767,7 +767,7 @@ class ImcoTkApp(object):
             self.img_canvas.create_image(499, 412, image=self.photo_img)
             self.path_label.config(text=self.session.img_path)
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
-            self.object_count_label.config(text = str(self.session.img.objectcount))
+            self.object_count_label.config(text = str(self.session.img.object_count))
             for code_label in self.code_labels:
                 code_label.set_from_image(self.session.img)
 
