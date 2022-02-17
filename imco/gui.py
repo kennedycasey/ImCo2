@@ -102,7 +102,8 @@ class ImcoTkApp(object):
         self.imagemenu.add_command(
                 label = 'Multiple objects',
                 command = self.handle_multiple_objects,
-                accelerator=meta_accelerator('='))
+                accelerator=meta_accelerator('='), 
+                state = Tk.DISABLED)
         self.imagemenu.add_command(
                 label='Beginning',
                 command = self.handle_first,
@@ -751,6 +752,7 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Same as previous image', state=Tk.NORMAL)
+        self.imagemenu.entryconfig('Multiple objects', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Beginning', state=Tk.NORMAL)
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next Skipped', state=Tk.NORMAL)
