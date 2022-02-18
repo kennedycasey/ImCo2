@@ -61,6 +61,14 @@ class ImcoSession(object):
             if row is not None:
                 img.fill_from_db_row(row, self.config.codes)
             images.append(img)
+            if img.object_count > 1:
+                for i in range(img.object_count-1):
+                    dimg = ImcoImage(path, self.config.codes)
+                    dimg.name = img.name + '_d'+str(i)
+                    row = img_rows.get(dimg.name)
+                    if row is not None:
+                        dimg.fill_from_db_row(row, self.config.codes)
+                    images.append(dimg)
         return images
 
     def set_dir(self, index):
@@ -110,26 +118,26 @@ class ImcoSession(object):
     def code_image(self, code, value):
         self.img.code(code, value)
         if self.img.is_coded(self.config.codes):
-            self.modified_images[self.img.path] = self.img
+            self.modified_images[self.img.path] = [img for img in self.dir.images if img.path==self.img.path]
 
     def set_image_object_count(self, object_count):
         if self.img.codes['None'] is not None:
             self.img.object_count = 0
         else: 
             self.img.object_count = object_count
-        self.modified_images[self.img.path] = self.img
+        self.modified_images[self.img.path] = [img for img in self.dir.images if img.path==self.img.path]
 
     def set_image_object_name(self, object_name):
         self.img.object_name = object_name
-        self.modified_images[self.img.path] = self.img
+        self.modified_images[self.img.path] = [img for img in self.dir.images if img.path==self.img.path]
 
     def set_image_comments(self, comments):
         self.img.comments = comments
-        self.modified_images[self.img.path] = self.img
+        self.modified_images[self.img.path] = [img for img in self.dir.images if img.path==self.img.path]
 
     def set_image_repeated(self, repeated):
         self.img.repeated = repeated
-        self.modified_images[self.img.path] = self.img
+        self.modified_images[self.img.path] = [img for img in self.dir.images if img.path==self.img.path]
 
     def img_coded(self):
         return self.img is not None and self.img.is_coded(self.config.codes)
@@ -140,7 +148,15 @@ class ImcoSession(object):
 
     def save(self):
         self.db.store_state(self.state)
-        modified = list(self.modified_images.values())
+        modified = []
+        for images in self.modified_images.values():
+            if len(images)>1:
+                for img in images:
+                    if img._modified != None:
+                        modified.append(img)
+            else:
+                modified += images
+        #modified = list(self.modified_images.values())
         self.modified_images = {}
         self.db.store_image_rows(modified, self.config.codes)
 
