@@ -366,14 +366,14 @@ class ImcoTkApp(object):
         else:
             n = int(self.number_objects)
             self.session.set_image_object_count(n)
-            self.session.modified_images[self.session.img.path]=[self.session.img]
+            self.session.modified_images[self.session.img.path] = [self.session.img]
             for i in range(n - 1):
                 #orig = self.session.img.path
                 #target = self.session.img.path[:-4] + '_d' + str(i + 1) + '.gif'
                 #path = shutil.copy(orig, target)
                 img = ImcoImage(self.session.img.path, self.session.config.codes)
                 img.object_count = n
-                img.name = self.session.img.name + '_d'+str(i)
+                img.name = self.session.img.name + '_d' + str(i)
                 self.session.dir.images.insert(self.session.img_index + 1, img)
                 self.session.modified_images[self.session.img.path].append(img)
             self.info("You indicated that there are " + str(n) + " objects in this image. Code them one at a time.")
@@ -396,12 +396,11 @@ class ImcoTkApp(object):
             self.session.db.delete_duplicate(name)
             del self.session.dir.images[orig_index+1]
             img = orig_path[:-4] + '_d' + str(i + 1) + '.gif'
-            os.remove(img)
-        self.session.img.object_count=1
-        self.session.modified_images[self.session.img.path]=self.session.img
+        self.session.img.object_count = 1
+        self.session.modified_images[self.session.img.path] = self.session.img
         self.multiple_undo_button.pack_forget()
         self.object_count_label.config(text = str(self.session.img.object_count))
-        self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
+        self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
     def handle_open(self, event=None):
         path = tkinter.filedialog.askdirectory(
