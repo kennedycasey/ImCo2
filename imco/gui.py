@@ -772,7 +772,7 @@ class ImcoTkApp(object):
             image=image.resize((950, 750), Image.ANTIALIAS)
             self.photo_img = ImageTk.PhotoImage(image)
             self.img_canvas.create_image(499, 412, image=self.photo_img)
-            self.path_label.config(text=re.sub('^(.*images/)', '', self.selected_image))
+            self.path_label.config(text=re.sub('^(.*images/)|_d[0-9]', '', self.selected_image))
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
             self.object_count_label.config(text = str(self.session.img.object_count))
             for code_label in self.code_labels:
@@ -785,7 +785,7 @@ class ImcoTkApp(object):
             image=image.resize((950, 750), Image.ANTIALIAS)
             self.photo_img = ImageTk.PhotoImage(image)
             self.img_canvas.create_image(499, 412, image=self.photo_img)
-            self.path_label.config(text=self.session.img_path)
+            self.path_label.config(text=re.sub('_d[0-9]', '', self.session.img_path))
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
             self.object_count_label.config(text = str(self.session.img.object_count))
             for code_label in self.code_labels:
