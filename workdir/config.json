@@ -1,9 +1,13 @@
 {
   "codes": [
       {
-          "code": "OutofFrame",
+          "code": "OutOfFrame",
           "label": "Object out of frame",
-          "key": "O"
+          "key": "O",
+          "required": true,
+          "prompt": "Y/N",
+          "values": ["Y", "N"]
+
       },
       {
           "code": "StudyRelated",
