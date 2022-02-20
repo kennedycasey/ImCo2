@@ -2,7 +2,7 @@
 
 A Python Tkinter application for coding _lots_ of images.
 
-IMCO ("IMage COder") is a Python-based application for efficiently annotating image directories with pre-defined, categorical values. Version 1 is available [here](https://github.com/marisacasillas/ImCo). The app as provided is set up for annotating child-centric daylong image streams, but the input values can be edited to fit your custom needs. The current version (version 2) introduces a few new features---most notably, an option for including text entries in addition to pre-defined categories and an option to view context images.
+IMCO ("IMage COder") is a Python-based application for efficiently annotating image directories with pre-defined, categorical values. Version 1 is available [here](https://github.com/marisacasillas/ImCo). The app as provided is set up for annotating child-centric daylong image streams, but the input values can be edited to fit your custom needs. The current version (Version 2) introduces a few new features - most notably, an option for including text entries in addition to pre-defined categories and an option to view context images. This version of the application is fully functional but still in development to meet the evolving needs of an ongoing annotation project.
 
 ## Running IMCO
 Launch the application by running `app.py` in the imco directory (make sure the file is executable with Python 3 on your machine, e.g., `chmod +x app.py` for OSX with Python 3 installed).
