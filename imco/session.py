@@ -61,14 +61,14 @@ class ImcoSession(object):
             if row is not None:
                 img.fill_from_db_row(row, self.config.codes)
             images.append(img)
-            if img.object_count > 1:
-                for i in range(img.object_count-1):
-                    dimg = ImcoImage(path, self.config.codes)
-                    dimg.name = img.name + '_d'+str(i)
-                    row = img_rows.get(dimg.name)
-                    if row is not None:
-                        dimg.fill_from_db_row(row, self.config.codes)
-                    images.append(dimg)
+            #if img.object_count > 1:
+                #for i in range(img.object_count - 1):
+                    #dimg = ImcoImage(path, self.config.codes)
+                    #dimg.name = img.name + '_d' + str(i)
+                    #row = img_rows.get(dimg.name)
+                    #if row is not None:
+                        #dimg.fill_from_db_row(row, self.config.codes)
+                    #images.append(dimg)
         return images
 
     def set_dir(self, index):
@@ -266,4 +266,7 @@ class ImcoImage(object):
             elif not code.exception and value is not None:
                 if self._object_name != '':
                     return True
+            elif not code.exception and code.required and value is None:
+                if self._object_name != '':
+                    return False   
         return False
