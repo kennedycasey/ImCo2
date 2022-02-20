@@ -150,12 +150,15 @@ class ImcoSession(object):
         self.db.store_state(self.state)
         modified = []
         for images in self.modified_images.values():
-            if len(images)>1:
-                for img in images:
-                    if img._modified != None:
-                        modified.append(img)
-            else:
-                modified += images
+            try: 
+                if len(images) > 1:
+                    for img in images:
+                        if img._modified != None:
+                            modified.append(img)
+                else:
+                    modified += images
+            except TypeError:
+                pass
         #modified = list(self.modified_images.values())
         self.modified_images = {}
         self.db.store_image_rows(modified, self.config.codes)

@@ -353,7 +353,7 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('.'), self.handle_repeated)
         self.root.bind(meta_binding('='), self.handle_multiple_objects)
 
-    def handle_multiple_objects(self, event=None):
+    def handle_multiple_objects(self, event = None):
         self.number_objects = simpledialog.askstring(
                 title = "MULTIPLE OBJECTS",
                 prompt = "How many objects are in the image?",
@@ -369,6 +369,8 @@ class ImcoTkApp(object):
             n = int(self.number_objects)
             self.session.set_image_object_count(n)
             self.session.modified_images[self.session.img.path] = [self.session.img]
+            # when there is more than one object in the image (as identified by the user), 
+            # duplicate the target image so that individual objects can be coded on separate screens
             for i in range(n - 1):
                 #orig = self.session.img.path
                 #target = self.session.img.path[:-4] + '_d' + str(i + 1) + '.gif'
@@ -383,7 +385,7 @@ class ImcoTkApp(object):
             self.object_count_label.config(text = str(self.session.img.object_count))
             self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
-    def handle_undo_multiple(self, event=None):
+    def handle_undo_multiple(self, event = None):
         if '_d' in self.session.img.name:
             orig_path = self.session.img.path[:-7] + self.session.img.path[-4:]
             orig_index = self.session.img_index - (self.session.img.object_count - int(self.session.img.path[-5]))
