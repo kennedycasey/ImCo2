@@ -17,7 +17,6 @@ from imco.version import VERSION
 from imco.session import ImcoSession, ImcoImage
 import imco
 
-
 INFO_FRAME_WIDTH = 400
 DEFAULT_CANVAS_SIZE = 700
 
@@ -51,117 +50,121 @@ class ImcoTkApp(object):
     def build_menu(self):
         self.root.option_add('*tearOff', False)
         self.menubar = Tk.Menu(self.root)
-        self.appmenu = Tk.Menu(self.menubar, name='apple')
+        self.appmenu = Tk.Menu(self.menubar, name = 'apple')
         self.filemenu = Tk.Menu(self.root)
-        self.menubar.add_cascade(label='File', menu=self.filemenu)
+        self.menubar.add_cascade(label = 'File', menu = self.filemenu)
         self.filemenu.add_command(
-                label='Open workdir',
-                command=self.handle_open,
-                accelerator=meta_accelerator('O'))
+                label = 'Open workdir',
+                command = self.handle_open,
+                accelerator = meta_accelerator('O'))
         self.filemenu.add_command(
-                label='Open specific image',
-                command=self.handle_open_image,
-                accelerator=meta_accelerator('I'),
-                state=Tk.DISABLED)
+                label = 'Open specific image',
+                command = self.handle_open_image,
+                accelerator = meta_accelerator('I'),
+                state = Tk.DISABLED)
         self.filemenu.add_command(
-                label='View context',
-                command=self.handle_open_context,
-                accelerator=meta_accelerator('V'),
-                state=Tk.DISABLED)
+                label = 'View context',
+                command = self.handle_open_context,
+                accelerator = meta_accelerator('V'),
+                state = Tk.DISABLED)
         self.filemenu.add_command(
-                label='Save',
-                command=self.handle_save,
-                accelerator=meta_accelerator('S'),
-                state=Tk.DISABLED)
+                label = 'Save',
+                command = self.handle_save,
+                accelerator = meta_accelerator('S'),
+                state = Tk.DISABLED)
         self.filemenu.add_command(
-                label='Export codes to CSV',
-                command=self.handle_export,
-                accelerator=meta_accelerator('E'),
-                state=Tk.DISABLED)
+                label = 'Export codes to CSV',
+                command = self.handle_export,
+                accelerator = meta_accelerator('E'),
+                state = Tk.DISABLED)
         self.filemenu.add_command(
-                label='Check progress',
-                command=self.handle_check_progress,
+                label = 'Check progress',
+                command = self.handle_check_progress,
                 state=Tk.DISABLED)
         self.imagemenu = Tk.Menu(self.root)
-        self.menubar.add_cascade(label='Image', menu=self.imagemenu)
+        self.menubar.add_cascade(
+            label = 'Image', 
+            menu = self.imagemenu)
         self.imagemenu.add_command(
-                label='Previous',
-                command=self.handle_prev_image,
-                accelerator='Left',
-                state=Tk.DISABLED)
+                label = 'Previous',
+                command = self.handle_prev_image,
+                accelerator = 'Left',
+                state = Tk.DISABLED)
         self.imagemenu.add_command(
-                label='Next',
-                command=self.handle_next_image,
-                accelerator='Right',
-                state=Tk.DISABLED)
+                label = 'Next',
+                command = self.handle_next_image,
+                accelerator = 'Right',
+                state = Tk.DISABLED)
         self.imagemenu.add_command(
-                label='Same as previous image',
-                command=self.handle_repeated,
-                accelerator=meta_accelerator('.'),
-                state=Tk.DISABLED)
+                label = 'Same as previous image',
+                command = self.handle_repeated,
+                accelerator = meta_accelerator('.'),
+                state = Tk.DISABLED)
         self.imagemenu.add_command(
                 label = 'Multiple objects',
                 command = self.handle_multiple_objects,
-                accelerator=meta_accelerator('='), 
+                accelerator = meta_accelerator('='), 
                 state = Tk.DISABLED)
         self.imagemenu.add_command(
-                label='Beginning',
+                label = 'Beginning',
                 command = self.handle_first,
                 accelerator = meta_accelerator('Left'),
                 state = Tk.DISABLED)
         self.imagemenu.add_command(
-                label='End',
-                command=self.handle_frontier,
-                accelerator=meta_accelerator('Right'),
-                state=Tk.DISABLED)
+                label = 'End',
+                command = self.handle_frontier,
+                accelerator = meta_accelerator('Right'),
+                state = Tk.DISABLED)
         self.imagemenu.add_command(
-            label='Next Skipped',
-            command=self.handle_next_skipped,
-            state=Tk.DISABLED)
+            label = 'Next Skipped',
+            command = self.handle_next_skipped,
+            state = Tk.DISABLED)
         self.imagemenu.add_command(
-            label='Previous Skipped',
-            command=self.handle_prev_skipped,
-            state=Tk.DISABLED)
+            label = 'Previous Skipped',
+            command = self.handle_prev_skipped,
+            state = Tk.DISABLED)
         self.entrymenu = Tk.Menu(self.root)
-        self.menubar.add_cascade(label='Text Entry', menu=self.entrymenu)
+        self.menubar.add_cascade(
+            label = 'Text Entry', 
+            menu = self.entrymenu)
         self.entrymenu.add_command(
-            label='Add object name',
-            command=self.handle_object_entry,
-            accelerator=meta_accelerator('L'),
-            state=Tk.DISABLED)
+            label = 'Add object name',
+            command = self.handle_object_entry,
+            accelerator = meta_accelerator('L'),
+            state = Tk.DISABLED)
         self.entrymenu.add_command(
-            label='Add comment',
-            command=self.handle_comment_entry,
-            accelerator=meta_accelerator('U'),
-            state=Tk.DISABLED)
+            label = 'Add comment',
+            command = self.handle_comment_entry,
+            accelerator = meta_accelerator('U'),
+            state = Tk.DISABLED)
         self.entrymenu.add_command(
-            label='Find and replace object',
-            command=self.handle_find_replace,
-            accelerator=meta_accelerator('R'),
-            state=Tk.DISABLED)
-        self.root.config(menu=self.menubar)
+            label = 'Find and replace object',
+            command = self.handle_find_replace,
+            accelerator = meta_accelerator('R'),
+            state = Tk.DISABLED)
+        self.root.config(menu = self.menubar)
 
-    def handle_object_entry(self, event=None):
-        self.imagemenu.entryconfig('Next', state=Tk.DISABLED)
-        self.imagemenu.entryconfig('Previous', state=Tk.DISABLED)
+    def handle_object_entry(self, event = None):
+        self.imagemenu.entryconfig('Next', state = Tk.DISABLED)
+        self.imagemenu.entryconfig('Previous', state = Tk.DISABLED)
         if self.session.img.object_name != '':
             self.handle_remove_object_entry()
         self.object_entry = simpledialog.askstring(
-                title="Add object name(s)",
-                prompt="Reminder: Make sure to add commas between names if there are 2+ objects",
-                parent=self.root)
+                title = "ADD OBJECT NAME",
+                prompt = "",
+                parent = self.root)
         if self.object_entry is not None:
             self.object_name = Tk.Label(
                 self.info_frame,
                 text = "Your object name(s): " + self.object_entry,
                 fg = '#05976c',
                 bg = '#f6f6f6',
-                wraplength=375)
-            self.object_name.pack(fill=Tk.X)
+                wraplength = 375)
+            self.object_name.pack(fill = Tk.X)
             self.object_undo_button.pack()
             self.session.set_image_object_name(self.object_entry)
-        self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
-        self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
+        self.imagemenu.entryconfig('Next', state = Tk.NORMAL)
+        self.imagemenu.entryconfig('Previous', state = Tk.NORMAL)
 
     def handle_remove_object_entry(self):
         self.object_undo_button.pack_forget()
@@ -179,7 +182,7 @@ class ImcoTkApp(object):
         if self.session.img.comments != '':
             self.handle_remove_comment_entry()
         self.comment_entry = simpledialog.askstring(
-                title="Add comments",
+                title="ADD COMMENTS",
                 prompt="",
                 parent=self.root)
         if self.comment_entry is not None:
@@ -195,7 +198,7 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Next', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
 
-    def handle_check_progress(self, event=None):
+    def handle_check_progress(self, event = None):
         count = 0
         for dir in self.session.dirs:
             img_lst = self.session.load_images(dir)
@@ -206,76 +209,75 @@ class ImcoTkApp(object):
 
     def build_main_window(self):
         self.root.title("IMCO  v{}".format(VERSION))
-        self.root.config(bg=DEFAULT_BG)
+        self.root.config(bg = DEFAULT_BG)
         self.build_fonts()
-        self.info_frame = Tk.Frame(self.root, bg=DEFAULT_BG)
-        self.info_frame.grid(column=0, row=0, sticky=Tk.N+Tk.W, padx=10)
+        self.info_frame = Tk.Frame(self.root, bg = DEFAULT_BG)
+        self.info_frame.grid(column = 0, row = 0, sticky = Tk.N + Tk.W, padx = 10)
         self.path_section_label = Tk.Label(
                 self.info_frame,
-                anchor=Tk.W,
-                justify=Tk.LEFT,
-                font=self.section_font,
-                fg=SECTION_FG,
-                bg=DEFAULT_BG,
-                text='PATH')
-        self.path_section_label.pack(fill=Tk.X, pady=(10, 0))
+                anchor = Tk.W,
+                justify = Tk.LEFT,
+                font = self.section_font,
+                fg = SECTION_FG,
+                bg = DEFAULT_BG,
+                text = 'PATH')
+        self.path_section_label.pack(fill = Tk.X, pady = (10, 0))
         self.path_label = Tk.Label(
                 self.info_frame,
-                anchor=Tk.W,
-                justify=Tk.LEFT,
-                bg=DEFAULT_BG)
-        self.path_label.pack(fill=Tk.X)
+                anchor = Tk.W,
+                justify = Tk.LEFT,
+                bg = DEFAULT_BG)
+        self.path_label.pack(fill = Tk.X)
         self.order_section_label = Tk.Label(
                 self.info_frame,
-                anchor=Tk.W,
-                justify=Tk.LEFT,
-                font=self.section_font,
-                fg=SECTION_FG,
-                bg=DEFAULT_BG,
-                text='IMAGE NUMBER')
-        self.order_section_label.pack(fill=Tk.X, pady=(10, 0))
+                anchor = Tk.W,
+                justify = Tk.LEFT,
+                font = self.section_font,
+                fg = SECTION_FG,
+                bg = DEFAULT_BG,
+                text = 'IMAGE NUMBER')
+        self.order_section_label.pack(fill = Tk.X, pady = (10, 0))
         self.order_label = Tk.Label(
             self.info_frame,
-                anchor=Tk.W,
-                justify=Tk.LEFT,
-                bg=DEFAULT_BG)
-        self.order_label.pack(fill=Tk.X)
+                anchor = Tk.W,
+                justify = Tk.LEFT,
+                bg = DEFAULT_BG)
+        self.order_label.pack(fill = Tk.X)
         self.object_count_section_label = Tk.Label(
                 self.info_frame,
-                anchor=Tk.W,
-                justify=Tk.LEFT,
-                font=self.section_font,
-                fg=SECTION_FG,
-                bg=DEFAULT_BG,
-                text='OBJECT COUNT')
-        self.object_count_section_label.pack(fill=Tk.X, pady=(10, 0))
+                anchor = Tk.W,
+                justify = Tk.LEFT,
+                font = self.section_font,
+                fg = SECTION_FG,
+                bg = DEFAULT_BG,
+                text = 'OBJECT COUNT')
+        self.object_count_section_label.pack(fill = Tk.X, pady = (10, 0))
         self.object_count_label = Tk.Label(
             self.info_frame,
-                anchor=Tk.W,
-                justify=Tk.LEFT,
-                bg=DEFAULT_BG)
-        self.object_count_label.pack(fill=Tk.X)
+                anchor = Tk.W,
+                justify = Tk.LEFT,
+                bg = DEFAULT_BG)
+        self.object_count_label.pack(fill = Tk.X)
         self.codes_section_label = Tk.Label(
                 self.info_frame,
-                anchor=Tk.W,
-                justify=Tk.LEFT,
-                font=self.section_font,
-                fg=SECTION_FG,
-                bg=DEFAULT_BG,
-                text='CODES')
-        self.codes_section_label.pack(fill=Tk.X, pady=(10, 0))
-        self.code_frame = Tk.Frame(self.info_frame, bg=DEFAULT_BG)
-        self.code_frame.pack(fill=Tk.X)
+                anchor = Tk.W,
+                justify = Tk.LEFT,
+                font = self.section_font,
+                fg = SECTION_FG,
+                bg = DEFAULT_BG,
+                text = 'CODES')
+        self.codes_section_label.pack(fill = Tk.X, pady = (10, 0))
+        self.code_frame = Tk.Frame(self.info_frame, bg = DEFAULT_BG)
+        self.code_frame.pack(fill = Tk.X)
         self.entries_section_label = Tk.Label(
                 self.info_frame,
-                anchor=Tk.W,
-                justify=Tk.LEFT,
-                font=self.section_font,
-                fg=SECTION_FG,
-                bg=DEFAULT_BG,
-                text='TEXT ENTRIES')
-        self.entries_section_label.pack(fill=Tk.X, pady=(10, 0))
-        self.comment_exists=False
+                anchor = Tk.W,
+                justify = Tk.LEFT,
+                font = self.section_font,
+                fg = SECTION_FG,
+                bg = DEFAULT_BG,
+                text = 'TEXT ENTRIES')
+        self.entries_section_label.pack(fill = Tk.X, pady = (10, 0))
         self.object_undo_button = Tk.Button(
             self.info_frame,
             text = 'Undo object entry',
@@ -299,30 +301,30 @@ class ImcoTkApp(object):
         )
         self.img_canvas = Tk.Canvas(
                 self.root,
-                bg=CANVAS_BG,
-                highlightthickness=0)
+                bg = CANVAS_BG,
+                highlightthickness = 0)
         self.resize_canvas(DEFAULT_CANVAS_SIZE, DEFAULT_CANVAS_SIZE)
-        self.img_canvas.grid(column=1, row=0)
-        self.root.grid_columnconfigure(0, minsize=INFO_FRAME_WIDTH)
+        self.img_canvas.grid(column = 1, row = 0)
+        self.root.grid_columnconfigure(0, minsize = INFO_FRAME_WIDTH)
         self.root.update()
         self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
 
     def build_fonts(self):
-        label = Tk.Label(self.root, text='sample')
-        self.section_font = tkinter.font.Font(font=label['font'])
+        label = Tk.Label(self.root, text = 'sample')
+        self.section_font = tkinter.font.Font(font = label['font'])
         size = self.section_font['size']
-        self.section_font.config(size=size-2)
+        self.section_font.config(size = size - 2)
 
     def resize_canvas(self, x, y):
-        self.img_canvas.config(width=x, height=y)
+        self.img_canvas.config(width = x, height = y)
 
     def build_code_labels(self, codes):
         for code in codes:
             self.define_code_label(code)
 
     def define_code_label(self, code):
-        cl = CodeLabel(code, root=self.code_frame, row=len(self.code_labels),
-                listen=self.root, handler=self.handle_code)
+        cl = CodeLabel(code, root = self.code_frame, row = len(self.code_labels),
+                listen = self.root, handler = self.handle_code)
         self.code_labels.append(cl)
 
     def install_protocols(self):
@@ -353,9 +355,9 @@ class ImcoTkApp(object):
 
     def handle_multiple_objects(self, event=None):
         self.number_objects = simpledialog.askstring(
-                title="Multiple objects",
-                prompt="How many objects are in the image?",
-                parent=self.root)
+                title = "MULTIPLE OBJECTS",
+                prompt = "How many objects are in the image?",
+                parent = self.root)
 
         if (self.number_objects is None or len(self.number_objects) == 0):
             pass
@@ -379,22 +381,22 @@ class ImcoTkApp(object):
             self.info("You indicated that there are " + str(n) + " objects in this image. Code them one at a time.")
             self.multiple_undo_button.pack()
             self.object_count_label.config(text = str(self.session.img.object_count))
-            self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
+            self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
     def handle_undo_multiple(self, event=None):
         if '_d' in self.session.img.name:
-            orig_path = self.session.img.path[:-7]+self.session.img.path[-4:]
-            orig_index = self.session.img_index - (self.session.img.object_count-int(self.session.img.path[-5]))
+            orig_path = self.session.img.path[:-7] + self.session.img.path[-4:]
+            orig_index = self.session.img_index - (self.session.img.object_count - int(self.session.img.path[-5]))
         else:
             orig_path = self.session.img.path
             orig_index = self.session.img_index
         object_count = self.session.img.object_count
         self.session.img_index = orig_index - 1
         self.handle_next_image_conditional()
-        for i in reversed(range(object_count-1)):
-            name = self.session.dir.images[orig_index+1].name
+        for i in reversed(range(object_count - 1)):
+            name = self.session.dir.images[orig_index + 1].name
             self.session.db.delete_duplicate(name)
-            del self.session.dir.images[orig_index+1]
+            del self.session.dir.images[orig_index + 1]
             img = orig_path[:-4] + '_d' + str(i + 1) + '.gif'
         self.session.img.object_count = 1
         self.session.modified_images[self.session.img.path] = self.session.img
@@ -1019,9 +1021,9 @@ class ContextApp(object):
 
     def build_fonts(self):
         label = Tk.Label(self.root, text='sample')
-        self.section_font = tkinter.font.Font(font=label['font'])
+        self.section_font = tkinter.font.Font(font = label['font'])
         size = self.section_font['size']
-        self.section_font.config(size=size-2)
+        self.section_font.config(size = size-2)
 
     def delete_window(self):
         self.root.destroy()
