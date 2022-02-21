@@ -386,6 +386,10 @@ class ImcoTkApp(object):
             self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
     def handle_undo_multiple(self, event = None):
+        if 'DUPLICATE' in self.session.img.name:
+            change = self.session.img.object_count-int(self.session.img.name[-5])
+            self.session.img_index -= (change+1)
+            self.handle_next_image_conditional()    
         for i in reversed(range(self.session.img.object_count - 1)):
             name = self.session.dir.images[self.session.img_index + i + 1].name
             self.session.db.delete_duplicate(name)
