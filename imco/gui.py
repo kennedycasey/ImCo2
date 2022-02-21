@@ -506,7 +506,7 @@ class ImcoTkApp(object):
 
     def handle_repeated(self, event=None):
         if self.session.img.object_count > 1 and 'DUPLICATE' in self.session.img.name:
-            self.info("Hold up! This is the same as the previous image, but you're coding a different object")
+            self.info("Hold up! This is image is the same as the last one. You should be coding a different object.")
             return
         if self.session.img_index == 0:
             self.info("Whoops! This is the very first image, so it can't be coded as same as previous image.")
@@ -630,9 +630,6 @@ class ImcoTkApp(object):
     def handle_next_image(self, event=None):
         if self.session.img.codes['None'] is not None:
             self.session.set_image_object_count(0)
-            if self.session.img.object_name != '' or len([i for i in self.session.img.codes.values() if i!=None])>2:
-                self.info("You coded None in this image, but gave an object name or coded another category. Please recode the image")
-                return
         elif self.session.img.codes['None'] is None and self.session.img.object_count <=1:
             self.session.set_image_object_count(1)
         if self.session is None:
@@ -674,9 +671,6 @@ class ImcoTkApp(object):
         if self.session.img.is_coded(self.session.config.codes):
             if self.session.img.codes['None'] is not None:
                 self.session.set_image_object_count(0)
-                if self.session.img.object_name != '' or len([i for i in self.session.img.codes.values() if i!=None])>2:
-                    self.info("You coded None in this image, but gave an object name or coded another category. Please recode the image")
-                return
             elif self.session.img.codes['None'] is None and self.session.img.object_count <=1:
                 self.session.set_image_object_count(1)
         if self.session is None:
