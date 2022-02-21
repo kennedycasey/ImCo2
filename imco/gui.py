@@ -486,22 +486,28 @@ class ImcoTkApp(object):
             path = 'multiple-dirs'
         else:
             path = re.sub('/', '', re.sub('([^\/]+$)', '', self.session.img_path))
-        name = path + '_' + self.initials + '_' + time_rep
-        fh = tkinter.filedialog.asksaveasfile(
-                mode='w',
-                defaultextension='.csv',
-                initialfile = name,
-                filetypes=[('CSV', '*.csv')],
-                parent=self.root)
-        if fh:
-            self.session.export_to_csv(fh)
-            fh.close()
+        try:
+            name = path + '_' + self.initials + '_' + time_rep
+            fh = tkinter.filedialog.asksaveasfile(
+                    mode='w',
+                    defaultextension='.csv',
+                    initialfile = name,
+                    filetypes=[('CSV', '*.csv')],
+                    parent=self.root)
+            if fh:
+                self.session.export_to_csv(fh)
+                fh.close()
+        except TypeError:
+            pass
 
     def handle_code(self, code, value):
         if self.session:
             self.session.code_image(code, value)
 
     def handle_repeated(self, event=None):
+        if self.session.img.object_count > 1 and 'DUPLICATE' in self.session.img.name:
+            self.info("Hold up! This is the same as the previous image, but you're coding a different object")
+            return
         if self.session.img_index == 0:
             self.info("Whoops! This is the very first image, so it can't be coded as same as previous image.")
         elif self.session.img_index != self.prev_viewed_img_index + 1:
@@ -528,11 +534,16 @@ class ImcoTkApp(object):
                 title="FIND",
                 prompt="Enter the object name you want to find",
                 parent=self.root)
-        self.replace = simpledialog.askstring(
-                title="REPLACE",
-                prompt="Enter the object name to replace: " + self.find.upper(),
-                parent=self.root)
+        try:
+            self.replace = simpledialog.askstring(
+                    title="REPLACE",
+                    prompt="Enter the object name to replace: " + self.find.upper(),
+                    parent=self.root)
+        except AttributeError:
+            return
         old_name = self.find
+        if self.replace==None:
+            return
         new_name = self.replace
         for img in self.session.dir.images:
             if img.object_name.find(old_name) != -1:
@@ -619,6 +630,9 @@ class ImcoTkApp(object):
     def handle_next_image(self, event=None):
         if self.session.img.codes['None'] is not None:
             self.session.set_image_object_count(0)
+            if self.session.img.object_name != '' or len([i for i in self.session.img.codes.values() if i!=None])>2:
+                self.info("You coded None in this image, but gave an object name or coded another category. Please recode the image")
+                return
         elif self.session.img.codes['None'] is None and self.session.img.object_count <=1:
             self.session.set_image_object_count(1)
         if self.session is None:
@@ -660,6 +674,9 @@ class ImcoTkApp(object):
         if self.session.img.is_coded(self.session.config.codes):
             if self.session.img.codes['None'] is not None:
                 self.session.set_image_object_count(0)
+                if self.session.img.object_name != '' or len([i for i in self.session.img.codes.values() if i!=None])>2:
+                    self.info("You coded None in this image, but gave an object name or coded another category. Please recode the image")
+                return
             elif self.session.img.codes['None'] is None and self.session.img.object_count <=1:
                 self.session.set_image_object_count(1)
         if self.session is None:
