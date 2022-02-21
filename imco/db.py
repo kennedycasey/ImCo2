@@ -71,7 +71,6 @@ class ImcoDb(object):
         curs.execute(q, (name,))
         conn.commit()
 
-
     def store_image_rows(self, images, codes):
         conn = self.get()
         curs = conn.cursor()

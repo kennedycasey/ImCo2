@@ -372,12 +372,12 @@ class ImcoTkApp(object):
             # when there is more than one object in the image (as identified by the user), 
             # duplicate the target image so that individual objects can be coded on separate screens
             for i in range(n - 1):
-                #orig = self.session.img.path
-                #target = self.session.img.path[:-4] + '_d' + str(i + 1) + '.gif'
-                #path = shutil.copy(orig, target)
+                orig = self.session.img.path
+                target = self.session.img.path[:-4] + '_DUPLICATE' + str(i + 1) + '.gif'
+                path = shutil.copy(orig, target)
                 img = ImcoImage(self.session.img.path, self.session.config.codes)
                 img.object_count = n
-                img.name = self.session.img.name + '_d' + str(i)
+                img.name = self.session.img.name[:-4] + '_DUPLICATE' + str(i + 1) + '.gif'
                 self.session.dir.images.insert(self.session.img_index + 1, img)
                 self.session.modified_images[self.session.img.path].append(img)
             self.info("You indicated that there are " + str(n) + " objects in this image. Code them one at a time.")
@@ -386,20 +386,12 @@ class ImcoTkApp(object):
             self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
     def handle_undo_multiple(self, event = None):
-        if '_d' in self.session.img.name:
-            orig_path = self.session.img.path[:-7] + self.session.img.path[-4:]
-            orig_index = self.session.img_index - (self.session.img.object_count - int(self.session.img.path[-5]))
-        else:
-            orig_path = self.session.img.path
-            orig_index = self.session.img_index
-        object_count = self.session.img.object_count
-        self.session.img_index = orig_index - 1
-        self.handle_next_image_conditional()
-        for i in reversed(range(object_count - 1)):
-            name = self.session.dir.images[orig_index + 1].name
+        for i in reversed(range(self.session.img.object_count - 1)):
+            name = self.session.dir.images[self.session.img_index + i + 1].name
             self.session.db.delete_duplicate(name)
-            del self.session.dir.images[orig_index + 1]
-            img = orig_path[:-4] + '_d' + str(i + 1) + '.gif'
+            del self.session.dir.images[self.session.img_index + i + 1]
+            img = self.session.img.path[:-4] + '_DUPLICATE' + str(i + 1) + '.gif'
+            os.remove(img)
         self.session.img.object_count = 1
         self.session.modified_images[self.session.img.path] = self.session.img
         self.multiple_undo_button.pack_forget()
@@ -776,7 +768,7 @@ class ImcoTkApp(object):
             image=image.resize((950, 750), Image.ANTIALIAS)
             self.photo_img = ImageTk.PhotoImage(image)
             self.img_canvas.create_image(499, 412, image=self.photo_img)
-            self.path_label.config(text=re.sub('^(.*images/)|_d[0-9]', '', self.selected_image))
+            self.path_label.config(text=re.sub('^(.*images/)|_DUPLICATE[0-9]', '', self.selected_image))
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
             self.object_count_label.config(text = str(self.session.img.object_count))
             for code_label in self.code_labels:
@@ -789,7 +781,7 @@ class ImcoTkApp(object):
             image=image.resize((950, 750), Image.ANTIALIAS)
             self.photo_img = ImageTk.PhotoImage(image)
             self.img_canvas.create_image(499, 412, image=self.photo_img)
-            self.path_label.config(text=re.sub('_d[0-9]', '', self.session.img_path))
+            self.path_label.config(text=re.sub('_DUPLICATE[0-9]', '', self.session.img_path))
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
             self.object_count_label.config(text = str(self.session.img.object_count))
             for code_label in self.code_labels:

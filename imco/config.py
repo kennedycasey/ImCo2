@@ -1,9 +1,8 @@
 import json
 import os
 
-
 class ImcoConfig(object):
-
+    
     def __init__(self, config_path):
         self.config_path = config_path
         try:
@@ -31,7 +30,6 @@ class ImcoConfig(object):
         except KeyError:
             return default
 
-
 class ImcoCode(object):
 
     def __init__(self, code, key, label=None, required=False, exception=False,
@@ -57,7 +55,6 @@ class ImcoCode(object):
             return '1' if value == '1' else None
         else:
             return value if value != 'NA' else None
-
 
 class InvalidConfig(Exception):
     pass
