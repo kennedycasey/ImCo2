@@ -52,6 +52,36 @@ class ImcoSession(object):
     def glob(self, *components):
         return glob.glob(self.path(*components))
 
+    def load_images_start(self, imco_dir):
+        paths = sorted(glob.glob(os.path.join(imco_dir.path, self.config.image_glob)))
+        img_rows = self.db.load_image_rows(imco_dir.name)
+        images = []
+        for path in paths:
+            img = ImcoImage(path, self.config.codes)
+            row = img_rows.get(img.name)
+            if row is not None:
+                img.fill_from_db_row(row, self.config.codes)
+                images.append(img)
+            else:
+                if 'DUPLICATE' in img.name:
+                    if row==None:
+                        os.remove(img.path)  
+                    else:
+                        images.append(img)
+                else:
+                    images.append(img)
+        for index in range(len(images)):
+            if images[index].object_count>1:
+                if 'DUPLICATE' not in images[index].name:
+                    i = index+1
+                    count=1
+                    while 'DUPLICATE' in images[i].name:
+                        count+=1
+                        i+=1
+                    for j in range(count):
+                        images[index+j].object_count = count
+        return images
+
     def load_images(self, imco_dir):
         paths = sorted(glob.glob(os.path.join(imco_dir.path, self.config.image_glob)))
         img_rows = self.db.load_image_rows(imco_dir.name)
@@ -179,7 +209,7 @@ class ImcoDir(object):
     @property
     def images(self):
         if self._images is None:
-            self._images = self.session.load_images(self)
+            self._images = self.session.load_images_start(self)
         return self._images
 
 
@@ -210,7 +240,7 @@ class ImcoImage(object):
                 self.codes[code.code] = code.from_db(db_value)
         self._comments = row['Comments']
         self._object_name = row['Object']
-        if row['ObjectCount'] is not None:
+        if row['ObjectCount'] is None:
             self.object_count = 0
         else:
             self.object_count = row['ObjectCount']
