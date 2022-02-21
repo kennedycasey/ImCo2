@@ -10,6 +10,15 @@
 
       },
       {
+        "code": "Reaching",
+        "label": "Reaching",
+        "key": "R",
+        "required": true,
+        "prompt": "Y/N",
+        "values": ["Y", "N"]
+
+    },
+      {
           "code": "StudyRelated",
           "label": "Study-related object",
           "key": "X"
