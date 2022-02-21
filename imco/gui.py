@@ -398,6 +398,7 @@ class ImcoTkApp(object):
             os.remove(img)
         self.session.img.object_count = 1
         self.session.modified_images[self.session.img.path] = self.session.img
+        self.session.save()
         self.multiple_undo_button.pack_forget()
         self.object_count_label.config(text = str(self.session.img.object_count))
         self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
