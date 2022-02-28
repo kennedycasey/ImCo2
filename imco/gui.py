@@ -432,10 +432,12 @@ class ImcoTkApp(object):
         if os.path.exists(path + '/state.db'):
             self.info("Wait a second! A state.db file already exists in your workdir. Make sure to close the program and delete this file if it's from an old image directory.")
         # TODO: Handle empty path, missing files, etc.
-        self.open_workdir(path)
-        if len(self.session.dirs) > 1:
-            self.info("FYI: There are " + str(len(self.session.dirs)) + " image directories in your workdir. Close the program and remove any directories if needed.")
-
+        try:
+            self.open_workdir(path)
+            if len(self.session.dirs) > 1:
+                self.info("FYI: There are " + str(len(self.session.dirs)) + " image directories in your workdir. Close the program and remove any directories if needed.")
+        except AttributeError:
+            return
     def handle_open_image(self, event=None):
         self.set_prev_viewed_image()
         try:
@@ -806,9 +808,7 @@ class ImcoTkApp(object):
         try:
             self.session = ImcoSession(path)
         except imco.config.InvalidConfig:
-            self.session = None
             self.info("Invalid working directory: missing config.json")
-        if self.session is None:
             return
         self.app_state.set('workdir', path)
         self.build_code_labels(self.session.config.codes)
