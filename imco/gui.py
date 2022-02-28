@@ -808,8 +808,12 @@ class ImcoTkApp(object):
         try:
             self.session = ImcoSession(path)
         except imco.config.InvalidConfig:
-            self.info("Invalid working directory: missing config.json")
-            return
+            try:
+                if self.session.workdir is not None:
+                    return
+            except AttributeError:
+                self.info("Invalid working directory: missing config.json")
+                return
         self.app_state.set('workdir', path)
         self.build_code_labels(self.session.config.codes)
         self.resize_canvas(
