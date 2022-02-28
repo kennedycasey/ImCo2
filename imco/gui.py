@@ -508,6 +508,16 @@ class ImcoTkApp(object):
         if self.session.img.object_count > 1 and 'DUPLICATE' in self.session.img.name:
             self.info("Hold up! This is image is the same as the last one. You should be coding a different object.")
         elif self.session.dir.images[self.session.img_index-1].object_count > 1:
+            if self.session.img.object_count > 1:
+                self.handle_undo_multiple()
+                try:
+                    self.handle_remove_object_entry()
+                except AttributeError:
+                    pass
+                try:
+                    self.handle_remove_comment_entry()
+                except AttributeError:
+                    pass
             n = self.session.dir.images[self.session.img_index-1].object_count
             self.session.set_image_object_count(n)
             self.session.set_image_repeated(self.session.dir._images[self.session.img_index-n].codes.copy())
@@ -531,6 +541,8 @@ class ImcoTkApp(object):
             self.multiple_undo_button.pack()
             self.object_count_label.config(text = str(self.session.img.object_count))
             self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
+            for code_label in self.code_labels:
+                code_label.set_from_image(self.session.img)
             self.prev_text()
             self.session.save()
         elif self.session.img_index == 0:
