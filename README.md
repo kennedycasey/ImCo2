@@ -35,12 +35,13 @@ See below for a table of app functions. Most have associated key commands, and c
 | File > Save | ⌘ + S | Save progress |
 | File > Export codes to CSV | ⌘ + E | Export your current state to a csv file |
 | File > Check progress | n/a | Get the number of remaining images to be coded in the current directory |
+| Image > Same as previous image | ⌘ + . | Code current image the same as the previous image |
+| Image > Multiple objects | ⌘ + = | Duplicate images to code multiple objects separately | 
+| Image > Clear codes | ⌘ + X | Remove existing hot key codes and/or text entries to recode from scratch |
 | Image > Beginning | ⌘ + &#8592; | Return to the first image in the current directory | 
 | Image > End | ⌘ + &#8594; | Jump to the next image to be coded | 
 | Image > Next Skipped | n/a | Jump to the next skipped image | 
 | Image > Previous Skipped | n/a | Jump to the previous skipped image |
-| Image > Same as previous image | ⌘ + . | Code current image the same as the previous image |
-| Image > Multiple objects | ⌘ + = | Duplicate images to code multiple objects separately | 
 | Text entry > Add object name | ⌘ + L | Pull up text entry box to add object name(s) | 
 | Text entry > Add comment | ⌘ + U | Pull up text entry box to add comment(s) |
 | Text entry > Find and replace object name | ⌘ + R | Relabel objects within the current directory |
