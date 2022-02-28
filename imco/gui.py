@@ -507,8 +507,7 @@ class ImcoTkApp(object):
     def handle_repeated(self, event=None):
         if self.session.img.object_count > 1 and 'DUPLICATE' in self.session.img.name:
             self.info("Hold up! This is image is the same as the last one. You should be coding a different object.")
-            return
-        if self.session.dir.images[self.session.img_index-1].object_count > 1:
+        elif self.session.dir.images[self.session.img_index-1].object_count > 1:
             n = self.session.dir.images[self.session.img_index-1].object_count
             self.session.set_image_object_count(n)
             self.session.set_image_repeated(self.session.dir._images[self.session.img_index-n].codes.copy())
@@ -523,17 +522,18 @@ class ImcoTkApp(object):
                 img = ImcoImage(self.session.img.path, self.session.config.codes)
                 img.object_count = n
                 img.name = self.session.img.name[:-4] + '_DUPLICATE' + str(i + 1) + '.gif'
-                img.repeated = self.session.dir.images[self.session.img_index-n-i+1].codes.copy()
+                img.repeated = self.session.dir.images[self.session.img_index - n + i + 1].codes.copy()
                 img.codes = img.repeated
-                img.comments = self.session.dir.images[self.session.img_index-n-i+1].comments
-                img.object_name = self.session.dir.images[self.session.img_index-n-i+1].object_name
+                img.comments = self.session.dir.images[self.session.img_index - n + i + 1].comments
+                img.object_name = self.session.dir.images[self.session.img_index - n + i + 1].object_name
                 self.session.dir.images.insert(self.session.img_index + 1, img)
                 self.session.modified_images[self.session.img.path].append(img)
             self.multiple_undo_button.pack()
             self.object_count_label.config(text = str(self.session.img.object_count))
             self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
+            self.prev_text()
             self.session.save()
-        if self.session.img_index == 0:
+        elif self.session.img_index == 0:
             self.info("Whoops! This is the very first image, so it can't be coded as same as previous image.")
         elif self.session.img_index != self.prev_viewed_img_index + 1:
             self.info("Hold up! You're viewing images out of order. Double check that this image matches the preceding image in time.")
