@@ -392,7 +392,8 @@ class ImcoTkApp(object):
             self.handle_next_image_conditional()    
         for i in reversed(range(self.session.img.object_count - 1)):
             name = self.session.dir.images[self.session.img_index + i + 1].name
-            self.session.db.delete_duplicate(name)
+            if self.session.dir.images[self.session.img_index + i + 1].is_coded(self.session.config.codes):
+                self.session.db.delete_duplicate(name)
             del self.session.dir.images[self.session.img_index + i + 1]
             img = self.session.img.path[:-4] + '_DUPLICATE' + str(i + 1) + '.gif'
             os.remove(img)
