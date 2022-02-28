@@ -101,6 +101,11 @@ class ImcoTkApp(object):
                 accelerator = meta_accelerator('.'),
                 state = Tk.DISABLED)
         self.imagemenu.add_command(
+            label = 'Clear codes',
+            command = self.handle_clear_codes,
+            accelerator = meta_accelerator('x'),
+            state = Tk.DISABLED)
+        self.imagemenu.add_command(
                 label = 'Multiple objects',
                 command = self.handle_multiple_objects,
                 accelerator = meta_accelerator('='), 
@@ -352,6 +357,7 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('Left'), self.handle_first)
         self.root.bind(meta_binding('.'), self.handle_repeated)
         self.root.bind(meta_binding('='), self.handle_multiple_objects)
+        self.root.bind(meta_binding('x'), self.handle_clear_codes)
 
     def handle_multiple_objects(self, event = None):
         self.number_objects = simpledialog.askstring(
@@ -404,6 +410,21 @@ class ImcoTkApp(object):
         self.object_count_label.config(text = str(self.session.img.object_count))
         self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
+    def handle_clear_codes(self, event=None):
+        self.session.img.codes = dict((c.code, None) for c in self.session.config.codes)
+        for code_label in self.code_labels:
+                code_label.set_from_image(self.session.img)
+        self.session.img.object_name = ''
+        self.session.img.comments = ''
+        try:
+            self.handle_remove_object_entry()
+        except AttributeError:
+            pass
+        try:
+            self.handle_remove_comment_entry()
+        except AttributeError:
+            pass
+    
     def handle_open(self, event=None):
         path = tkinter.filedialog.askdirectory(
             initialdir = os.getcwd(),
@@ -809,9 +830,11 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('End', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Next Skipped', state=Tk.NORMAL)
         self.imagemenu.entryconfig('Previous Skipped', state=Tk.NORMAL)
+        self.imagemenu.entryconfig('Clear codes', state = Tk.NORMAL)
         self.entrymenu.entryconfig('Add object name', state=Tk.NORMAL)
         self.entrymenu.entryconfig('Add comment', state=Tk.NORMAL)
         self.entrymenu.entryconfig('Find and replace object', state=Tk.NORMAL)
+
 
     def set_prev_viewed_image(self):
         self.prev_viewed_img_index = self.session.img_index
