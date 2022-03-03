@@ -542,6 +542,8 @@ class ImcoTkApp(object):
                     self.handle_remove_comment_entry()
                 except AttributeError:
                     pass
+            self.handle_clear_codes()
+            self.session.save()
             n = self.session.dir.images[self.session.img_index-1].object_count
             self.session.set_image_object_count(n)
             self.session.set_image_repeated(self.session.dir._images[self.session.img_index-n].codes.copy())
