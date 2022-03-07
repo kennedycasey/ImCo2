@@ -360,6 +360,10 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('x'), self.handle_clear_codes)
 
     def handle_multiple_objects(self, event = None):
+        try:
+            self.handle_undo_multiple()
+        except AttributeError:
+            pass
         self.number_objects = simpledialog.askstring(
                 title = "MULTIPLE OBJECTS",
                 prompt = "How many objects are in the image?",
