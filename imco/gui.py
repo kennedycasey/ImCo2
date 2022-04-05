@@ -399,15 +399,20 @@ class ImcoTkApp(object):
         if 'DUPLICATE' in self.session.img.name:
             change = self.session.img.object_count-int(self.session.img.name[-5])
             self.session.img_index -= (change+1)
-            self.handle_next_image_conditional()    
-        for i in reversed(range(self.session.img.object_count - 1)):
+            self.handle_next_image_conditional() 
+        if self.session.img.object_count==0:
+            count = self.session.dir.images[self.session.img_index+1].object_count 
+        else:
+            count = self.session.dir.images.object_count  
+        for i in reversed(range(count - 1)):
             name = self.session.dir.images[self.session.img_index + i + 1].name
             if self.session.dir.images[self.session.img_index + i + 1].is_coded(self.session.config.codes):
                 self.session.db.delete_duplicate(name)
             del self.session.dir.images[self.session.img_index + i + 1]
             img = self.session.img.path[:-4] + '_DUPLICATE' + str(i + 1) + '.gif'
             os.remove(img)
-        self.session.img.object_count = 1
+        if self.session.img.object_count != 0:
+            self.session.img.object_count = 1
         self.session.modified_images[self.session.img.path] = self.session.img
         self.session.save()
         self.multiple_undo_button.pack_forget()
