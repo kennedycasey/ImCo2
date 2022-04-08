@@ -35,6 +35,7 @@ class ImcoSession(object):
         self.dir_order = list(range(0, len(self.dirs)))
         rng.shuffle(self.dir_order)
         self.modified_images = {}
+        #dictionary mapping modified image paths to image objects
         self.dir_index = None
         self.dir = None
         self.img_index = None
@@ -53,6 +54,9 @@ class ImcoSession(object):
         return glob.glob(self.path(*components))
 
     def load_images_start(self, imco_dir):
+        #creates list of ImcoImage objects from directory images 
+        #and removes duplicate images that have not
+        #been coded yet for when a session is started
         paths = sorted(glob.glob(os.path.join(imco_dir.path, self.config.image_glob)))
         img_rows = self.db.load_image_rows(imco_dir.name)
         images = []
@@ -83,6 +87,7 @@ class ImcoSession(object):
         return images
 
     def load_images(self, imco_dir):
+        #creates list of ImcoImage objects from the current working directory
         paths = sorted(glob.glob(os.path.join(imco_dir.path, self.config.image_glob)))
         img_rows = self.db.load_image_rows(imco_dir.name)
         images = []
@@ -95,10 +100,12 @@ class ImcoSession(object):
         return images
 
     def set_dir(self, index):
+        #sets working directory
         self.dir_index = index
         self.dir = self.dirs[self.dir_order[index]]
 
     def prev_dir(self):
+        #moves one index back in list of directories
         if self.dir is None or self.dir_index == 0:
             return False
         self.set_dir(self.dir_index - 1)
@@ -106,6 +113,7 @@ class ImcoSession(object):
         return True
 
     def next_dir(self):
+        #moves on index forward in list of directories
         if self.dir is None or self.dir_index + 1 == len(self.dir_order):
             return False
         self.set_dir(self.dir_index + 1)
@@ -113,10 +121,12 @@ class ImcoSession(object):
         return True
 
     def set_image(self, index):
+        #changes image to inputted index in list of session images
         self.img_index = index
         self.img = self.dir.images[index]
 
     def prev_image(self):
+        #switches to previous image in the image list order
         if self.dir is None or self.img_index == 0:
             return False
         self.set_image(self.img_index - 1)
@@ -124,6 +134,7 @@ class ImcoSession(object):
         return True
 
     def next_image(self):
+        #switches to next image in the image list order
         if self.dir is None or self.img_index + 1 == len(self.dir.images):
             return False
         self.set_image(self.img_index + 1)
@@ -131,19 +142,24 @@ class ImcoSession(object):
         return True
 
     def jump_to_frontier_image(self):
+        #Goes to next uncoded image
         self.set_dir(int(self.state.get('dir_index', self.dir_index)))
         self.set_image(int(self.state.get('img_index', self.img_index)))
 
     def update_frontier(self):
+        #Updates index for next uncoded image
         self.state['dir_index'] = self.dir_index
         self.state['img_index'] = self.img_index
 
     def code_image(self, code, value):
+        #updates status of image code and adds it to list of modified
+        #images if fully coded
         self.img.code(code, value)
         if self.img.is_coded(self.config.codes):
             self.modified_images[self.img.path] = self.img
 
     def set_image_object_count(self, object_count):
+        #sets object_count attribute of ImcoImage object
         if self.img.codes['None'] is not None:
             self.img.object_count = 0
         else: 
@@ -151,25 +167,33 @@ class ImcoSession(object):
         self.modified_images[self.img.path] = self.img
 
     def set_image_object_name(self, object_name):
+        #sets object_name attribute of ImcoImage object
         self.img.object_name = object_name
         self.modified_images[self.img.path] = self.img
 
     def set_image_comments(self, comments):
+        #sets comments attribute of ImcoImage object
         self.img.comments = comments
         self.modified_images[self.img.path] = self.img
 
     def set_image_repeated(self, repeated):
+        #sets codes of image to be the codes of the previous image
         self.img.repeated = repeated
         self.modified_images[self.img.path] = self.img
 
     def img_coded(self):
+        #determines if ImcoImage object is fully coded
         return self.img is not None and self.img.is_coded(self.config.codes)
 
     def check_autosave(self):
+        #Automatically saves if there has been a certain number of modified
+        #images without a user or function saving progress
         if len(self.modified_images) == self.config.autosave_threshold:
             self.save()
 
     def save(self):
+        #stores code values of fully coded images that have been modified since
+        #the previous save statement to state.db file
         self.db.store_state(self.state)
         modified = []
         for images in self.modified_images.values():
@@ -184,6 +208,7 @@ class ImcoSession(object):
         self.db.store_image_rows(modified, self.config.codes)
 
     def export_to_csv(self, fh):
+        #exports table of code values to csv format 
         writer = csv.writer(fh, lineterminator='\n')
         coder = self.config.coder
         for i, row in enumerate(self.db.iterate_image_rows()):
@@ -222,6 +247,8 @@ class ImcoImage(object):
         self._comments = ''
         self._object_name = ''
         self._repeated = {}
+        #Whether or not image attributes were repeated from the previous image 
+        #in the directory
         self._object_count = 1
 
     @property
@@ -229,6 +256,7 @@ class ImcoImage(object):
         return self._modified.strftime(self.DATE_FORMAT)
 
     def fill_from_db_row(self, row, codes):
+        #Sets image attributes if image was previously coded
         self._modified = datetime.datetime.strptime(
                 row['Modified'], self.DATE_FORMAT)
         for code in codes:
@@ -243,6 +271,7 @@ class ImcoImage(object):
             self.object_count = row['ObjectCount']
 
     def code(self, code, value):
+        #updates code value and sets modification timestamp
         self.codes[code.code] = value
         self._modified = datetime.datetime.now()
 
@@ -282,6 +311,7 @@ class ImcoImage(object):
         self._modified = datetime.datetime.now()
 
     def is_coded(self, codes):
+        #determines if image is fully coded based on exception and required codes
         for code in codes:
             value = self.codes.get(code.code)
             if code.exception and value is not None:

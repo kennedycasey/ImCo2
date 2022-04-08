@@ -16,12 +16,14 @@ class ImcoDb(object):
         return self.connection.cursor()
 
     def load_state(self):
+        #Loads existing data for start of ImcoSession
         curs = self.get_cursor()
         q = '''SELECT * FROM `state`'''
         curs.execute(q)
         return dict(curs)
 
     def store_state(self, state):
+        #Used to save data in state.db
         conn = self.get()
         curs = conn.cursor()
         q = '''INSERT OR REPLACE INTO `state` (Var, Val) VALUES (?, ?)'''
@@ -36,10 +38,12 @@ class ImcoDb(object):
                 raise InvalidDb
 
     def load_image_rows(self, dir_name):
+        #Loads ImcoImage object data from existing state.db file
         rows = self.iterate_image_rows(dir_name)
         return dict((r['Image'], dict(r)) for r in rows)
 
     def iterate_image_rows(self, dir_name=None):
+        #Iterates over state.db file rows and returns data from each row
         curs = self.get_cursor()
         args = {}
         if dir_name is not None:
@@ -55,16 +59,8 @@ class ImcoDb(object):
         curs.execute(q, args)
         return curs
 
-    def first_image(self, codes):
-        conn = self.get()
-        curs = conn.cursor()
-        rows = curs.execute('SELECT * FROM `codes`;').fetchall()
-        if len(rows)==0:
-                curs.execute('ALTER TABLE `codes` ADD COLUMN Object')
-                curs.execute('ALTER TABLE `codes` ADD COLUMN Comments')
-        conn.commit()
-
     def delete_duplicate(self, name):
+        #Used to delete uncoded duplicate images when reloading the program
         conn = self.get()
         curs = conn.cursor()
         q = 'DELETE FROM codes WHERE Image=?;'
@@ -72,6 +68,7 @@ class ImcoDb(object):
         conn.commit()
 
     def store_image_rows(self, images, codes):
+        #Stores data of images with modified attributes into the state.db file 
         conn = self.get()
         curs = conn.cursor()
         code_columns = [c.code for c in codes]
@@ -88,6 +85,7 @@ class ImcoDb(object):
         conn.commit()
 
     def _ensure_schema(self, codes):
+        #Creates state.db file format
         conn = self.get()
         curs = conn.cursor()
         q = '''

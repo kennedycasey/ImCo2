@@ -150,6 +150,8 @@ class ImcoTkApp(object):
         self.root.config(menu = self.menubar)
 
     def handle_object_entry(self, event = None):
+        #Makes command to enter an object name, adds input to image object object_name
+        #attribute, and adds undo object button
         self.imagemenu.entryconfig('Next', state = Tk.DISABLED)
         self.imagemenu.entryconfig('Previous', state = Tk.DISABLED)
         if self.session.img.object_name != '':
@@ -182,6 +184,8 @@ class ImcoTkApp(object):
         self.session.set_image_comments('')
 
     def handle_comment_entry(self, event=None):
+        #Makes command to enter a comment, adds input to image object comment 
+        #attribute, and adds undo comment button
         self.imagemenu.entryconfig('Next', state=Tk.DISABLED)
         self.imagemenu.entryconfig('Previous', state=Tk.DISABLED)
         if self.session.img.comments != '':
@@ -204,6 +208,7 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
 
     def handle_check_progress(self, event = None):
+        #Checks and displays the number of uncoded images in the directory
         count = 0
         for dir in self.session.dirs:
             img_lst = self.session.load_images(dir)
@@ -339,6 +344,7 @@ class ImcoTkApp(object):
         atexit.register(self.handle_delete_window)
 
     def install_bindings(self):
+        #Sets the key commands for different drop down options
         if sys.platform != 'darwin':
             # On macOS, the accelerators defined in the menu setup appear to
             # automatically add bindings when no meta key is defined, which
@@ -360,6 +366,10 @@ class ImcoTkApp(object):
         self.root.bind(meta_binding('x'), self.handle_clear_codes)
 
     def handle_multiple_objects(self, event = None):
+        #If there are multiple objects in an image, the user indicates how
+        #many objects are in the image and then the image is duplicated that number minus
+        #one times so that each object can be coded one at a time. Both the ImcoImage object is 
+        #duplicated and duplicates of the image itself are made and put into the directory folder
         try:
             self.handle_undo_multiple()
         except AttributeError:
@@ -396,6 +406,7 @@ class ImcoTkApp(object):
             self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
     def handle_undo_multiple(self, event = None):
+        #Deletes all image duplicates in image list and directory folder and returns user to original image
         if 'DUPLICATE' in self.session.img.name:
             change = self.session.img.object_count-int(self.session.img.name[-5])
             self.session.img_index -= (change+1)
@@ -420,6 +431,7 @@ class ImcoTkApp(object):
         self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
 
     def handle_clear_codes(self, event=None):
+        #Clears ImcoImage codes dictionary and object and comment attributes
         self.session.img.codes = dict((c.code, None) for c in self.session.config.codes)
         for code_label in self.code_labels:
                 code_label.set_from_image(self.session.img)
@@ -435,6 +447,7 @@ class ImcoTkApp(object):
             pass
     
     def handle_open(self, event=None):
+        #Opens set of images if they are contained in one directory
         path = tkinter.filedialog.askdirectory(
             initialdir = os.getcwd(),
             parent=self.root)
@@ -447,7 +460,9 @@ class ImcoTkApp(object):
                 self.info("FYI: There are " + str(len(self.session.dirs)) + " image directories in your workdir. Close the program and remove any directories if needed.")
         except AttributeError:
             return
+
     def handle_open_image(self, event=None):
+        #Allows user to access directory of images and navigate to a specific image
         self.set_prev_viewed_image()
         try:
             self.selected_image.destroy()
@@ -471,6 +486,8 @@ class ImcoTkApp(object):
     # Makes list of image paths within 20 of the selected image and adds them to
     # ContextApp for creation of context images interface.
     def handle_open_context(self, event=None):
+        #If there is a set of context images, the function starts a new limited imco session containing 
+        #the 20 images before and after the current image for the user to view
         current_image_path = self.session.img.path
         self.current_dir_path = re.sub('([^\/]+$)', '', current_image_path)
         context_path = re.sub('images', 'context', self.current_dir_path)
@@ -507,6 +524,8 @@ class ImcoTkApp(object):
         self._handled_delete_window = True
 
     def handle_export(self, event=None):
+        #Exports csv containing filled in codes, objects, comments, timestamps, and number of objects
+        #for all fully coded images
         if  self.session is None:
             return
         self.initials = simpledialog.askstring(
@@ -538,6 +557,9 @@ class ImcoTkApp(object):
             self.session.code_image(code, value)
 
     def handle_repeated(self, event=None):
+        #Fills ImcoImage object with the same codes, object labels, and comments of sequentially
+        #previous image, including duplicates if the previous image had multiple objects in the
+        #image. Warns and stops the user if images are not being coded in sequential order. 
         if self.session.img.object_count > 1 and 'DUPLICATE' in self.session.img.name:
             self.info("Hold up! This is image is the same as the last one. You should be coding a different object.")
         elif self.session.dir.images[self.session.img_index-1].object_count > 1:
@@ -602,6 +624,8 @@ class ImcoTkApp(object):
             self.prev_text()
 
     def handle_find_replace(self, event=None):
+        #Prompts user to fill in an object name to replace, and a new object name to replace
+        #it with, and replaces it for all ImcoImages with that object name
         self.find = simpledialog.askstring(
                 title="FIND",
                 prompt="Enter the object name you want to find",
@@ -635,6 +659,7 @@ class ImcoTkApp(object):
             self.object_undo_button.pack()
         
     def handle_prev_image(self, event=None):
+        #Loads sequentially previous image, including any previously coded attributes
         if self.session.img.is_coded(self.session.config.codes):
             if self.session.img.codes['None'] is not None:
                 self.session.set_image_object_count(0)
@@ -660,6 +685,7 @@ class ImcoTkApp(object):
             self.info('This is the very first image.')
 
     def prev_text(self):
+        #Loads previously filled in comments or object name text for an image
         if self.session.img.object_name != '':
             self.object_name = Tk.Label(
                 self.info_frame,
@@ -681,6 +707,8 @@ class ImcoTkApp(object):
             self.comment_undo_button.pack()
 
     def formatting(self):
+        #Clears remove object, comment and/or undo multiple buttons when moving 
+        #to the next image 
         if not self.session.img_coded():
             self.session.update_frontier()
         self.object_undo_button.pack_forget()
@@ -700,6 +728,7 @@ class ImcoTkApp(object):
         self.prev_text()
 
     def handle_next_image(self, event=None):
+        #Loads next image in image list, but only if the image is fully coded
         if self.session.img.codes['None'] is not None:
             self.session.set_image_object_count(0)
         elif self.session.img.codes['None'] is None and self.session.img.object_count <=1:
@@ -740,6 +769,8 @@ class ImcoTkApp(object):
             self.formatting()
 
     def handle_next_image_conditional(self, event=None):
+        #Loads next image in the image list even if it is not fully coded. Used for functions that 
+        #Load images out of order 
         if self.session.img.is_coded(self.session.config.codes):
             if self.session.img.codes['None'] is not None:
                 self.session.set_image_object_count(0)
@@ -776,18 +807,21 @@ class ImcoTkApp(object):
             self.formatting()
 
     def handle_frontier(self, event=None):
+        #Loads next image that is not fully coded 
         if self.session is None:
             return
         self.session.jump_to_frontier_image()
         self.draw_image()
 
     def handle_first(self, event=None):
+        #Loads image at the very beginning of the image list
         if self.session is None:
             return
         self.session.img_index = 1
         self.handle_prev_image()
 
     def handle_prev_skipped(self, event=None):
+        #Loads first image appearing before the current one that was marked as skipped
         img_lst = self.session.load_images(self.session.dir)
         skipped = False
         for index in reversed(range(self.session.img_index)):
@@ -802,6 +836,7 @@ class ImcoTkApp(object):
             self.info("There are no skipped images in this direction.")
 
     def handle_next_skipped(self, event=None):
+        #Loads first image appearing after the current one that was marked as skipped
         img_lst = self.session.load_images(self.session.dir)
         skipped = False
         for index in range(self.session.img_index+1, len(img_lst)):
@@ -816,6 +851,8 @@ class ImcoTkApp(object):
             self.info("There are no skipped images in this direction.")
 
     def open_workdir(self, path):
+        #Opens directory of images, if it contains a config.json file
+        #Activates file menu and image menu commands
         try:
             self.session = ImcoSession(path)
         except imco.config.InvalidConfig:

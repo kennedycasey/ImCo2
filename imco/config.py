@@ -22,6 +22,7 @@ class ImcoConfig(object):
         
 
     def get(self, path, default=None):
+        #Retrieves codes and labels for coding session
         v = self.config
         try:
             for k in path.split('.'):
@@ -45,12 +46,14 @@ class ImcoCode(object):
             self.values = set(v.lower() for v in self.values)
 
     def to_db(self, value):
+        #Converts codes to format for state.db file
         if self.values is None:
             return '0' if value is None else '1'
         else:
             return 'NA' if value is None else value
 
     def from_db(self, value):
+        #Converts codes to formats for session
         if self.values is None:
             return '1' if value == '1' else None
         else:
