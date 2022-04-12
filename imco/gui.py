@@ -386,7 +386,14 @@ class ImcoTkApp(object):
             self.info("Whoops! You indicated that there is only one object in this image. If multiple objects are present, re-enter the correct number.")
     
         else:
-            n = int(self.number_objects)
+            try:
+                n = int(self.number_objects)
+            except ValueError:
+                self.info("Please enter a number greater than 1 to code multiple objects")
+                return
+            if n <= 1:
+                self.info("Please enter a number greater than 1 to code multiple objects")
+                return
             self.session.set_image_object_count(n)
             self.session.modified_images[self.session.img.path] = [self.session.img]
             # when there is more than one object in the image (as identified by the user), 
@@ -414,7 +421,7 @@ class ImcoTkApp(object):
         if self.session.img.object_count==0:
             count = self.session.dir.images[self.session.img_index+1].object_count 
         else:
-            count = self.session.dir.images.object_count  
+            count = self.session.img.object_count
         for i in reversed(range(count - 1)):
             name = self.session.dir.images[self.session.img_index + i + 1].name
             if self.session.dir.images[self.session.img_index + i + 1].is_coded(self.session.config.codes):
@@ -894,9 +901,9 @@ class ImcoTkApp(object):
     def draw_image(self):
         if self.selected_image is not None and len(self.selected_image)>0:
             image = Image.open(self.session.img.path)
-            image=image.resize((950, 750), Image.ANTIALIAS)
+            image=image.resize((975, 750), Image.ANTIALIAS)
             self.photo_img = ImageTk.PhotoImage(image)
-            self.img_canvas.create_image(499, 412, image=self.photo_img)
+            self.img_canvas.create_image(510, 412, image=self.photo_img)
             self.path_label.config(text=re.sub('^(.*images/)|_DUPLICATE[0-9]', '', self.selected_image))
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
             self.object_count_label.config(text = str(self.session.img.object_count))
@@ -907,9 +914,9 @@ class ImcoTkApp(object):
             if self.photo_img is not None:
                 self.img_canvas.delete(self.photo_img)
             image = Image.open(self.session.img.path)
-            image=image.resize((950, 750), Image.ANTIALIAS)
+            image=image.resize((975, 750), Image.ANTIALIAS)
             self.photo_img = ImageTk.PhotoImage(image)
-            self.img_canvas.create_image(499, 412, image=self.photo_img)
+            self.img_canvas.create_image(510, 412, image=self.photo_img)
             self.path_label.config(text=re.sub('_DUPLICATE[0-9]', '', self.session.img_path))
             self.order_label.config(text = str(self.session.img_index+1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
             self.object_count_label.config(text = str(self.session.img.object_count))
