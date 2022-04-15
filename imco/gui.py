@@ -48,10 +48,12 @@ class ImcoTkApp(object):
         self.root.mainloop()
 
     def build_menu(self):
+        #Constructs dropdown menu for actions for files/directories, images, and text entries
         self.root.option_add('*tearOff', False)
         self.menubar = Tk.Menu(self.root)
         self.appmenu = Tk.Menu(self.menubar, name = 'apple')
         self.filemenu = Tk.Menu(self.root)
+        #Menu for navigating directory and saving coding progress
         self.menubar.add_cascade(label = 'File', menu = self.filemenu)
         self.filemenu.add_command(
                 label = 'Open workdir',
@@ -82,6 +84,7 @@ class ImcoTkApp(object):
                 command = self.handle_check_progress,
                 state=Tk.DISABLED)
         self.imagemenu = Tk.Menu(self.root)
+        #Menu for coding images in specific orders 
         self.menubar.add_cascade(
             label = 'Image', 
             menu = self.imagemenu)
@@ -129,6 +132,7 @@ class ImcoTkApp(object):
             command = self.handle_prev_skipped,
             state = Tk.DISABLED)
         self.entrymenu = Tk.Menu(self.root)
+        #Menu for adding and editing comments and object labels to images
         self.menubar.add_cascade(
             label = 'Text Entry', 
             menu = self.entrymenu)
@@ -174,11 +178,13 @@ class ImcoTkApp(object):
         self.imagemenu.entryconfig('Previous', state = Tk.NORMAL)
 
     def handle_remove_object_entry(self):
+        #Tkinter button to remove displayed object label and clear attribute
         self.object_undo_button.pack_forget()
         self.object_name.destroy()
         self.session.set_image_object_name('')
 
     def handle_remove_comment_entry(self):
+        #Tkinter button to remove displayed comments and clear attribute
         self.comment_undo_button.pack_forget()
         self.comments.destroy()
         self.session.set_image_comments('')
@@ -218,6 +224,7 @@ class ImcoTkApp(object):
         self.info("Nice work! You have " + str(count) + " images left to code in this directory.")
 
     def build_main_window(self):
+        #Constructs window displaying code labels, path, object count, and undo buttons if needed
         self.root.title("IMCO  v{}".format(VERSION))
         self.root.config(bg = DEFAULT_BG)
         self.build_fonts()
@@ -431,8 +438,9 @@ class ImcoTkApp(object):
             os.remove(img)
         if self.session.img.object_count != 0:
             self.session.img.object_count = 1
-        self.session.modified_images[self.session.img.path] = self.session.img
-        self.session.save()
+        if self.session.img.is_coded(self.session.config.codes):
+            self.session.modified_images[self.session.img.path] = self.session.img
+            self.session.save()
         self.multiple_undo_button.pack_forget()
         self.object_count_label.config(text = str(self.session.img.object_count))
         self.order_label.config(text = str(self.session.img_index + 1) + ' of ' + str(len(self.session.load_images(self.session.dir))))
@@ -518,10 +526,12 @@ class ImcoTkApp(object):
             self.imagemenu.entryconfig('Previous', state=Tk.NORMAL)
 
     def handle_save(self, event=None):
+        #Saves coded image objects to state.db file
         if self.session is not None:
             self.session.save()
 
     def handle_delete_window(self):
+        #Closes session and saves progress on coded images
         if self._handled_delete_window:
             return
         if self.session is not None:
@@ -560,6 +570,7 @@ class ImcoTkApp(object):
             pass
 
     def handle_code(self, code, value):
+        #Fills in image object codes dictionary with values for each code
         if self.session:
             self.session.code_image(code, value)
 
@@ -899,6 +910,7 @@ class ImcoTkApp(object):
         self.prev_viewed_img_index = self.session.img_index
 
     def draw_image(self):
+        #Resizes and draws image depending if an image was selected out of order or not
         if self.selected_image is not None and len(self.selected_image)>0:
             image = Image.open(self.session.img.path)
             image=image.resize((975, 750), Image.ANTIALIAS)
@@ -961,6 +973,7 @@ class CodeLabel(object):
         self.draw_label()
 
     def set_value(self, value):
+        #Assigns value to a given code for display
         if value == self.value:
             return
         self.value = value
@@ -968,11 +981,13 @@ class CodeLabel(object):
         self.handler(self.code, value)
 
     def set_from_image(self, image):
+        #Loads from existing image object codes dictionary to display
         value = image.codes.get(self.code.code, None)
         self.value = value
         self.draw_label()
 
     def draw_label(self):
+        #Highlights codes that are selected for the image
         if self.value is None:
             text = self.code.label
             self.label.config(text=text, fg=self.UNSET_COLOR)
@@ -1029,6 +1044,7 @@ class CodeLabel(object):
 class ContextApp(object):
 
     def __init__(self, img_lst, context_path, context_image_path, max_x, max_y):
+        #Creates module on top of ImcoSession to scroll through nearby images
         self.root = Tk.Toplevel()
         self.context_path = context_path
         self.img_path = context_image_path
@@ -1043,6 +1059,7 @@ class ContextApp(object):
         self.open_image()
 
     def build_popup_window(self):
+        #Window to display information about context images
         self.root.title("Context Images")
         self.root.config(bg=DEFAULT_BG)
         self.build_fonts()
@@ -1107,6 +1124,7 @@ class ContextApp(object):
         self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
 
     def open_image(self):
+        #First image opened is the one selected in the session and is the target image
         self.img_index = self.target_index
         self.img = Tk.PhotoImage(file=self.img_path)
         self.context_img_canvas.img = self.img
@@ -1116,6 +1134,7 @@ class ContextApp(object):
         self.target_button.pack_forget()
 
     def next_context_image(self):
+        #Loads next sequential image in context set and draws it
         if self.img_index < len(self.img_lst) - 1 and self.img_index != self.target_index - 1:
             self.img_index += 1
             self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
@@ -1133,6 +1152,7 @@ class ContextApp(object):
             self.open_image()
 
     def prev_context_image(self):
+        #Loads previous sequential image in context set and draws it
         if self.img_index > 0 and self.img_index != self.target_index + 1:
             self.img_index -= 1
             self.img = Tk.PhotoImage(file=self.img_lst[self.img_index])
