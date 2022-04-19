@@ -312,14 +312,19 @@ class ImcoImage(object):
 
     def is_coded(self, codes):
         #determines if image is fully coded based on exception and required codes
+        req = len([i for i in codes if i.required])
+        req_count = 0
+        label = False
         for code in codes:
             value = self.codes.get(code.code)
             if code.exception and value is not None:
                 return True
-            elif not code.exception and value is not None:
+            elif not code.exception and not code.required and value is not None:
+                label = True
+            elif not code.exception and code.required and value is not None:
+                req_count+=1
+        if req_count == req:
+            if label:
                 if self._object_name != '':
                     return True
-            elif not code.exception and code.required and value is None:
-                if self._object_name != '':
-                    return False   
         return False
