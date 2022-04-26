@@ -46,6 +46,19 @@ See below for a table of app functions. Most have associated key commands and ca
 | Text entry > Add comment | ⌘ + U | Pull up text entry box to add comment(s) |
 | Text entry > Find and replace object name | ⌘ + R | Relabel objects within the current directory |
 
+## Removing functions
+In order to remove functions from the app, enter the following into the command line:
+
+python3 -c"import setup; setup.function()"
+
+Where 'function()' can be replaced by one of the following:
+
+**no_object_count()**: Removes functions and attributes for coding multiple objects in an image one at a time and noting the number of objects in an image
+
+**no_object_label()**: Removes functions and attributes for editing and labeling objects in an image
+
+**no_count_and labels()**: Runs both of the above functions
+
 ## Default annotation categories
 The default annotation categories are described below. The annotation scheme was developed for a project investigating children's first-person object handling experiences.
 | Hot key | Category | Second keystroke options | Value meaning |
