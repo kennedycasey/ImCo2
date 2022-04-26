@@ -59,6 +59,8 @@ Where 'function()' can be replaced by one of the following:
 
 **no_count_and labels()**: Runs both of the above functions
 
+When one of these functions is run, the gui.py, session.py, and db.py files are overwritten with these changes in functionality. 
+
 ## Default annotation categories
 The default annotation categories are described below. The annotation scheme was developed for a project investigating children's first-person object handling experiences.
 | Hot key | Category | Second keystroke options | Value meaning |
