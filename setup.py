@@ -135,7 +135,6 @@ def switch_extension(extension):
                     new_content.append(line.replace('gif', extension))
                 else:
                     new_content.append(line)
-        file = file[:-3] + '_e.py'
         with open(file, 'a') as f:
             f.write('\n'.join(new_content))
 
