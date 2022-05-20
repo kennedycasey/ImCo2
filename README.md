@@ -47,7 +47,7 @@ See below for a table of app functions. Most have associated key commands and ca
 | Text entry > Find and replace object name | ⌘ + R | Relabel objects within the current directory |
 
 ## Removing functions
-In order to remove functions from the app, enter the following into the command line:
+In order to remove functions from the app, enter the following into the command line while in the Imco2 directory:
 
 python3 -c"import setup; setup.function()"
 
@@ -58,6 +58,8 @@ Where 'function()' can be replaced by one of the following:
 **no_object_label()**: Removes functions and attributes for editing and labeling objects in an image
 
 **no_count_and labels()**: Runs both of the above functions
+
+**switch_extension(extension)**: Imco is by default set up for images with a .gif extension. If you have images with a different extension, you can switch by running this function, where the parameter is the extenstion you would like to switch to (ex: switch_extension('jpg')). 
 
 When one of these functions is run, the gui.py, session.py, and db.py files are overwritten with these changes in functionality. 
 
