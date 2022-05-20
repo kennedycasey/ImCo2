@@ -123,7 +123,7 @@ def no_count_and_labels():
         with open(file, 'a') as f:
             f.write('\n'.join(new_content))
 
-def extensions(extension):
+def switch_extension(extension):
 
     files = ['imco/gui.py', 'imco/config.py', 'workdir/config.json']
     for file in files:
