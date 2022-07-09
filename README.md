@@ -24,7 +24,6 @@ The structure of the working directory is as follows:
     *  ...
 * `state.db` (auto-generated database containing application state; **only present after you have opened a working directory**)
 
-
 ## Default functions
 See below for a table of app functions. Most have associated key commands and can also be executed by clicking the file menu options.
 
@@ -46,22 +45,20 @@ See below for a table of app functions. Most have associated key commands and ca
 | Text entry > Add comment | ⌘ + U | Pull up text entry box to add comment(s) |
 | Text entry > Find and replace object name | ⌘ + R | Relabel objects within the current directory |
 
-## Removing functions
+## Options to remove functions
+Not all annotation projects will require all IMCO features (e.g., text entries or multiple annotation screens for the same image). To remove specific functions from the app, run `python3 -c "import setup; setup.function()"`, where `function()` can be replaced by one of the following:
+
 In order to remove functions from the app, enter the following into the command line while in the Imco2 directory:
 
-python3 -c"import setup; setup.function()"
+**no_object_count()**: Removes functions and attributes for coding the same image on multiple screens
 
-Where 'function()' can be replaced by one of the following:
+**no_object_label()**: Removes functions and attributes for adding text entries
 
-**no_object_count()**: Removes functions and attributes for coding multiple objects in an image one at a time and noting the number of objects in an image
+**no_count_and labels()**: Removes both of the above functions
 
-**no_object_label()**: Removes functions and attributes for editing and labeling objects in an image
+**switch_extension(extension)**: Switch from gifs (IMCO default) to your desired image format (e.g., `switch_extension('jpg')`).
 
-**no_count_and labels()**: Runs both of the above functions
-
-**switch_extension(extension)**: Imco is by default set up for images with a .gif extension. If you have images with a different extension, you can switch by running this function, where the parameter is the extenstion you would like to switch to (ex: switch_extension('jpg')). 
-
-When one of these functions is run, the gui.py, session.py, and db.py files are overwritten with these changes in functionality. 
+A note of warning: Running any of these functions overwrites gui.py, session.py, and db.py, so save local versions of the existing files as needed beforehand.
 
 ## Default annotation categories
 The default annotation categories are described below. The annotation scheme was developed for a project investigating children's first-person object handling experiences.
@@ -70,7 +67,7 @@ The default annotation categories are described below. The annotation scheme was
 | **O** | **Object out of frame** | Y, N | Is the handled object visible? "Y" means you cannot see any part of the object, "N" means that you can see at least a portion of the object |
 | **R** | **Reaching** | Y, N | Is the handled object being reached for? "Y" means there is reaching, "N" means that there is hand-to-object contact. |
 | **X** | **Study-related object** | n/a | Includes cameras, vests, headbands/hats, instructions, etc. that are present in the environment because the study is happening |
-| **F** | **Food** | n/a | Includes food, drinks, and other consumables (e.g., drugs) |
+| **F** | **Food** | n/a | Includes food, drinks, and other consumables (e.g., stimulants) |
 | **C** | **Clothing** | n/a | Includes non-study-related items that can be worn (e.g., shirt, pants, shoe, necklace, purse, etc.) |
 | **T** | **Toy** | n/a | Includes objects that are designed solely for recreational/play purposes, regardless of their size (e.g., ball, doll, sandbox, swing, slide, etc.) | 
 | **B** | **Book** | n/a | Includes all books (for kids or adults), along with notebooks and paper | 
@@ -92,4 +89,4 @@ The default annotation categories are described below. The annotation scheme was
 ## Attribution
 If you use IMCO, please cite the following:
 
-Casey, K., Fisher, W., Tice, S. C., & Casillas, M. (2022). ImCo: A Python Tkinter application for coding _lots_ of images, version 2.0 [Computer software]. Retrieved from https://github.com/kennedycasey/ImCo2.
+Casey, K., Fisher, W., Tice, S. C., & Casillas, M. (2022). ImCo: A Python Tkinter application for coding _lots_ of images, Version 2.0 [Computer software]. Retrieved from https://github.com/kennedycasey/ImCo2.
